@@ -90,8 +90,7 @@ Note that the map update will itself indulge in a bit of Ship Static Data harves
 
 ### Some further notes
 
-If you don't want a given section displayed (eg volcanoes are pretty much static day-to-day and just clutter the map, so
-I generally don't display them) you can disable them by commenting out the relevant line in `config/xplanet.conf`.
+If you don't want a given section displayed (eg volcanoes are pretty much static day-to-day and just clutter the map, so I generally don't display them) you can disable them by setting `enabled = False` in the `[volcanoes]` section of `config/worldmap.conf`.
 
 Storms will drop off the map when the `expiry_days` (see worldmap.conf [storm_markers] section) is exceeded.
 
@@ -99,6 +98,8 @@ With shipping icons there are basically two variants Cargo (has a 'C' in the mid
 They each have their own default colours, but these can also vary if the system detects their draught (loading) has
 decreased. Shipping with speeds less than 1.0 knots, or flagged as moored are NOT displayed. This avoids masses of ship
 icons overlaying each other in port locations making a mess on the map.
+
+You can have a look at the symbols used for these and other markers on the map by viewing the images in the `symbols` folder.
 
 ### Running the harvester
 
