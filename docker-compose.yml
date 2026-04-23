@@ -18,7 +18,7 @@ services:
       - ./config:/opt/project/config
     healthcheck:
       # Specifically check for an updated file in the data directory
-      test: ["CMD", "find", "/opt/project/data/quake_markers.txt", "-mmin", "-30"]
+      test: [ "CMD", "find", "/opt/project/data/quake_markers.txt", "-mmin", "-30" ]
       interval: 5m
       timeout: 10s
       retries: 3

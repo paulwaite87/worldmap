@@ -4,38 +4,33 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="81fb972d-9761-4cee-aed3-ce77125008a1" name="Changes" comment="Modified .gitignore">
-      <change afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.env.tmpl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/common.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/worldmap-example.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/run_xplanet" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/update_clouds" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/update_composite_image" afterDir="false" />
+    <list default="true" id="81fb972d-9761-4cee-aed3-ce77125008a1" name="Changes" comment="Large amount of re-work to the way scripts are organised in particular the configuration methodology is greatly improved. Also brought the CreateCloudMaps and XPlanet execution and configuration into the main configuration file.">
+      <change afterPath="$PROJECT_DIR$/scripts/do_harvest_shipdata" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/do_map_updates" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/cloudmap.conf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/config/worldmap.conf" beforeDir="false" afterPath="$PROJECT_DIR$/config/worldmap.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/xplanet.conf" beforeDir="false" afterPath="$PROJECT_DIR$/config/xplanet.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/do_harvest_shipdata.sh" beforeDir="false" afterPath="$PROJECT_DIR$/do_harvest_shipdata.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/do_map_updates.sh" beforeDir="false" afterPath="$PROJECT_DIR$/do_map_updates.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/do_harvest_shipdata.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/do_harvest_shipdata.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/do_map_updates.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/do_map_updates.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/screenshot-linux.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/screenshot-mac.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/map_system_daemon.py" beforeDir="false" afterPath="$PROJECT_DIR$/map_system_daemon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/create_map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/harvest_ship_data" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/harvest_ship_data" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/run_xplanet" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/run_xplanet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/update_clouds" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_clouds" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/update_clouds_nasa" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_clouds_nasa" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/update_composite_image" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_composite_image" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/update_isobars" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_isobars" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/update_quake_markers" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_quakes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/update_quakes" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_quakes" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/update_shipping" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_shipping" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/update_storm_markers" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_storms" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/update_volcano_markers" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_volcanoes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/update_storms" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_storms" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/update_volcanoes" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/update_volcanoes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/check_noaa_gws_layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/check_noaa_gws_layers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/overlay_outlines.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/overlay_outlines.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uv.lock" beforeDir="false" afterPath="$PROJECT_DIR$/uv.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/wallpaper_update_daemon.py" beforeDir="false" afterPath="$PROJECT_DIR$/wallpaper_update_daemon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wallpaper_updater.sh" beforeDir="false" afterPath="$PROJECT_DIR$/wallpaper_updater.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +63,9 @@
     "accountId": "3515d5cd-5f67-4a1e-bfa2-02bfe2fe2a35"
   }
 }]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/data/ship_markers.txt" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -99,7 +97,8 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
+    "run.code.analysis.last.selected.profile": "aDefault",
+    "settings.editor.selected.configurable": "actions.on.save",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
@@ -111,10 +110,10 @@
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/scripts" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/config" />
       <recent name="$PROJECT_DIR$/tools" />
       <recent name="$PROJECT_DIR$/resources" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -135,7 +134,7 @@
       <workItem from="1776645202417" duration="1723000" />
       <workItem from="1776646940703" duration="255000" />
       <workItem from="1776647219069" duration="34641000" />
-      <workItem from="1776748174059" duration="41876000" />
+      <workItem from="1776748174059" duration="48416000" />
     </task>
     <task id="LOCAL-00001" summary="Initial repo commit">
       <option name="closed" value="true" />
@@ -153,7 +152,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776808622433</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Large amount of re-work to the way scripts are organised in particular the configuration methodology is greatly improved. Also brought the CreateCloudMaps and XPlanet execution and configuration into the main configuration file.">
+      <option name="closed" value="true" />
+      <created>1776907022836</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1776907022836</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -165,6 +172,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial repo commit" />
     <MESSAGE value="Modified .gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modified .gitignore" />
+    <MESSAGE value="Large amount of re-work to the way scripts are organised in particular the configuration methodology is greatly improved. Also brought the CreateCloudMaps and XPlanet execution and configuration into the main configuration file." />
+    <option name="LAST_COMMIT_MESSAGE" value="Large amount of re-work to the way scripts are organised in particular the configuration methodology is greatly improved. Also brought the CreateCloudMaps and XPlanet execution and configuration into the main configuration file." />
   </component>
 </project>

@@ -14,6 +14,7 @@ data/ship_cache.json
 .env.local
 
 # --- Python ---
+.idea/
 .venv/
 __pycache__/
 *.py[cod]

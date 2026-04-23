@@ -1,35 +1,35 @@
 #!/usr/bin/env python3
-import sys
-import os
-import subprocess
-import time
-import signal
-import logging
 import argparse
 import configparser
+import logging
+import os
+import signal
+import subprocess
+import sys
+import time
 from datetime import datetime
 
 # Setup logging to stdout so Docker picks it up
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
 # Define which section this specific script should look at
-SCRIPT_SECTION = 'daemon'
+SCRIPT_SECTION = "daemon"
 
 
 class Daemon:
     def __init__(self, **kwargs):
-        self.map_updater = kwargs.get('map_updater', './do_map_updates.sh')
-        self.update_sleep = int(kwargs.get('update_sleep', 120))
-        self.harvester = kwargs.get('harvester', './do_harvest_shipdata.sh')
-        self.harvest_sleep = int(kwargs.get('harvest_sleep', 600))
-        self.morning_time = kwargs.get('morning', '09:00')
-        self.evening_time = kwargs.get('evening', '23:00')
-        self.harvester_enabled = bool(kwargs.get('harvester_enabled', False))
+        self.map_updater = kwargs.get("map_updater", "scripts/do_map_updates.sh")
+        self.update_sleep = int(kwargs.get("update_sleep", 120))
+        self.harvester = kwargs.get("harvester", "scripts/do_harvest_shipdata.sh")
+        self.harvest_sleep = int(kwargs.get("harvest_sleep", 600))
+        self.morning_time = kwargs.get("morning", "09:00")
+        self.evening_time = kwargs.get("evening", "23:00")
+        self.harvester_enabled = bool(kwargs.get("harvester_enabled", False))
         self.running = True
 
         # Signal handling for graceful Docker stops
@@ -42,17 +42,20 @@ class Daemon:
 
     def is_morning_shift(self):
         """Determines if current time falls between morning and evening start times."""
-        now = datetime.now().strftime('%H:%M')
+        now = datetime.now().strftime("%H:%M")
         # String comparison works for HH:MM format
         return self.morning_time <= now < self.evening_time
 
     def run(self):
         logger.info("World Map System Daemon Started")
-        logger.info(f"Morning Shift ({self.morning_time}): {self.map_updater} (Sleep {self.update_sleep}s)")
+        logger.info(
+            f"Morning Shift ({self.morning_time}): {self.map_updater} (Sleep {self.update_sleep}s)"
+        )
 
         status_str = "ENABLED" if self.harvester_enabled else "DISABLED"
         logger.info(
-            f"Evening Shift ({self.evening_time}): {self.harvester} ({status_str}, Sleep {self.harvest_sleep}s)")
+            f"Evening Shift ({self.evening_time}): {self.harvester} ({status_str}, Sleep {self.harvest_sleep}s)"
+        )
 
         while self.running:
             if self.is_morning_shift():
@@ -76,7 +79,9 @@ class Daemon:
                 except Exception as e:
                     logger.error(f"Unexpected error: {e}")
             else:
-                logger.info(f"[{mode_label}] Harvesting is currently disabled. Skipping.")
+                logger.info(
+                    f"[{mode_label}] Harvesting is currently disabled. Skipping."
+                )
 
             # 3. Step-based sleep to catch signals quickly
             if self.running:
@@ -108,13 +113,19 @@ if __name__ == "__main__":
     else:
         try:
             params = {
-                'map_updater': config.get(s, 'map_updater', fallback='./do_map_updates.sh'),
-                'update_sleep': config.getint(s, 'update_sleep', fallback=120),
-                'harvester': config.get(s, 'harvester', fallback='./do_harvest_shipdata.sh'),
-                'harvest_sleep': config.getint(s, 'harvest_sleep', fallback=600),
-                'harvester_enabled': config.getboolean(s, 'harvester_enabled', fallback=False),
-                'morning': config.get(s, 'morning', fallback='09:00'),
-                'evening': config.get(s, 'evening', fallback='23:00')
+                "map_updater": config.get(
+                    s, "map_updater", fallback="scripts/do_map_updates"
+                ),
+                "update_sleep": config.getint(s, "update_sleep", fallback=120),
+                "harvester": config.get(
+                    s, "harvester", fallback="scripts/do_harvest_shipdata"
+                ),
+                "harvest_sleep": config.getint(s, "harvest_sleep", fallback=600),
+                "harvester_enabled": config.getboolean(
+                    s, "harvester_enabled", fallback=False
+                ),
+                "morning": config.get(s, "morning", fallback="09:00"),
+                "evening": config.get(s, "evening", fallback="23:00"),
             }
         except Exception as e:
             logger.critical(f"Failed to parse config section [{s}]: {e}")

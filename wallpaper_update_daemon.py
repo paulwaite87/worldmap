@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-import os
-import sys
-import subprocess
-import time
-import logging
 import argparse
-import shutil
 import glob
+import logging
+import os
+import shutil
+import subprocess
+import sys
+import time
 from pathlib import Path
-from watchdog.observers import Observer
+
 from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s'
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class MapRefreshHandler(FileSystemEventHandler):
     def __init__(self, watch_dir, pattern):
         self.watch_dir = os.path.abspath(watch_dir)
         self.pattern = pattern
-        self.de = os.environ.get('XDG_CURRENT_DESKTOP', '').lower()
+        self.de = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
         self.last_applied = None
         logger.info(f"Monitoring {self.pattern} in {self.watch_dir} (DE: {self.de})")
 
@@ -40,7 +40,7 @@ class MapRefreshHandler(FileSystemEventHandler):
             return
 
         # Trigger on file lifecycle events
-        if event.event_type in ('created', 'modified', 'moved'):
+        if event.event_type in ("created", "modified", "moved"):
             latest = self.get_latest_file()
 
             # Prevent feedback loop from cleanup logic
@@ -53,7 +53,7 @@ class MapRefreshHandler(FileSystemEventHandler):
         uri = f"file://{path}"
         try:
             # --- KDE PLASMA (Surgical D-Bus method) ---
-            if 'plasma' in self.de or 'kde' in self.de:
+            if "plasma" in self.de or "kde" in self.de:
                 # We use JS to update the wallpaper property only,
                 # avoiding a full desktop layout reset.
                 script = f"""
@@ -65,31 +65,80 @@ class MapRefreshHandler(FileSystemEventHandler):
                     d.writeConfig("Image", "{uri}");
                 }}
                 """
-                subprocess.run([
-                    "qdbus", "org.kde.plasmashell", "/PlasmaShell",
-                    "org.kde.PlasmaShell.evaluateScript", script
-                ], check=True)
+                subprocess.run(
+                    [
+                        "qdbus",
+                        "org.kde.plasmashell",
+                        "/PlasmaShell",
+                        "org.kde.PlasmaShell.evaluateScript",
+                        script,
+                    ],
+                    check=True,
+                )
 
             # --- GNOME / UNITY / POP!_OS ---
-            elif any(name in self.de for name in ['gnome', 'unity', 'ubuntu', 'pop']):
-                subprocess.run(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", uri], check=True)
-                subprocess.run(["gsettings", "set", "org.gnome.desktop.background", "picture-uri-dark", uri],
-                               check=True)
-                subprocess.run(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "zoom"],
-                               check=True)
+            elif any(name in self.de for name in ["gnome", "unity", "ubuntu", "pop"]):
+                subprocess.run(
+                    [
+                        "gsettings",
+                        "set",
+                        "org.gnome.desktop.background",
+                        "picture-uri",
+                        uri,
+                    ],
+                    check=True,
+                )
+                subprocess.run(
+                    [
+                        "gsettings",
+                        "set",
+                        "org.gnome.desktop.background",
+                        "picture-uri-dark",
+                        uri,
+                    ],
+                    check=True,
+                )
+                subprocess.run(
+                    [
+                        "gsettings",
+                        "set",
+                        "org.gnome.desktop.background",
+                        "picture-options",
+                        "zoom",
+                    ],
+                    check=True,
+                )
 
             # --- XFCE ---
-            elif 'xfce' in self.de:
+            elif "xfce" in self.de:
                 cmd = f"xfconf-query -c xfce4-desktop -p /backdrop -l | grep last-image | xargs -I % xfconf-query -c xfce4-desktop -p % -s '{path}'"
                 subprocess.run(cmd, shell=True, check=True)
 
             # --- CINNAMON ---
-            elif 'cinnamon' in self.de:
-                subprocess.run(["gsettings", "set", "org.cinnamon.desktop.background", "picture-uri", uri], check=True)
+            elif "cinnamon" in self.de:
+                subprocess.run(
+                    [
+                        "gsettings",
+                        "set",
+                        "org.cinnamon.desktop.background",
+                        "picture-uri",
+                        uri,
+                    ],
+                    check=True,
+                )
 
             # --- MATE ---
-            elif 'mate' in self.de:
-                subprocess.run(["gsettings", "set", "org.mate.background", "picture-filename", path], check=True)
+            elif "mate" in self.de:
+                subprocess.run(
+                    [
+                        "gsettings",
+                        "set",
+                        "org.mate.background",
+                        "picture-filename",
+                        path,
+                    ],
+                    check=True,
+                )
 
             # --- FALLBACK (FEH) ---
             else:
@@ -123,9 +172,18 @@ if __name__ == "__main__":
     once_only = False
     parser = argparse.ArgumentParser(description="World Map Wallpaper Refresh Daemon")
     parser.add_argument("--once", action="store_true", dest="once_only", default=False)
-    parser.add_argument("--directory", type=str, required=True, help="Directory to watch for new renders")
-    parser.add_argument("--suffix", type=str, default="worldmap.jpg",
-                        help="Suffix of the render files (e.g. worldmap.jpg)")
+    parser.add_argument(
+        "--directory",
+        type=str,
+        required=True,
+        help="Directory to watch for new renders",
+    )
+    parser.add_argument(
+        "--suffix",
+        type=str,
+        default="worldmap.jpg",
+        help="Suffix of the render files (e.g. worldmap.jpg)",
+    )
     args = parser.parse_args()
 
     watch_path = Path(args.directory).absolute()
@@ -144,7 +202,7 @@ if __name__ == "__main__":
         logger.info(f"Startup refresh: {initial_map}")
         handler.apply_wallpaper(initial_map)
     else:
-        logger.info(f"No initial map found")
+        logger.info("No initial map found")
 
     # A once-only call, so exit
     if args.once_only:
