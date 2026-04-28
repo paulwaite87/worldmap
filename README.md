@@ -120,7 +120,14 @@ With shipping icons there are basically two variants Cargo (has a 'C' in the mid
 They each have their own default colours, but these can also vary if the system detects their draught (loading) has
 decreased.
 
-Tip: If you have `show_only_active_ships` set to True, shipping with speeds less than 1.0 knots, or flagged as anchored or moored are NOT displayed. This avoids masses of ship
+Shipping data is problematic in that each loop we are in the role of hoping to catch position broadcasts, and these 
+are variable in frequency from ship to ship. So don't be surprised if your 'picture' of which ships are on the map 
+fluctuates each time around the loop because of this.
+
+Tip: The longer you set `listen_for_positional_data` in the `[shipping]` section of `worldmap.conf`, the better are your
+chances of catching all ships positional data inside your bounding-box, and the less variable your picture of ships will be.
+
+Tip: If you have `filter_only_active_ships` set to True, shipping with speeds less than 1.0 knots, or flagged as anchored or moored are NOT displayed. This avoids masses of ship
 icons overlaying each other in port locations making a mess on the map.
 
 You can have a look at the symbols used for these and other markers on the map by viewing the images in the `symbols` folder.

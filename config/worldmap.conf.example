@@ -11,7 +11,7 @@ workdir = .
 update_sleep = 120
 harvest_sleep = 1200
 morning = 06:00
-evening = 19:00
+evening = 21:00
 
 [clouds]
 # Clouds sourced via https://clouds.matteason.co.uk/
@@ -24,7 +24,7 @@ height = 1024
 force = False
 
 [clouds_nasa]
-# Optional source for clouds; may have issues so prefer the above
+# Optional source for clouds; use as backup for the above
 enabled = False
 url = https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi
 outfile = data/cloud_map.jpg
@@ -101,8 +101,6 @@ url = wss://stream.aisstream.io/v0/stream
 outfile = data/ship_markers.txt
 # Time to listen for positional data broadcasts
 listen_for_positional_data = 240
-# Time to listen for static data broadcasts
-listen_for_static_data = 10
 # Order is important! [Lat South, Lon West, Lat North, Lon East]
 # Example Bounding Box List:
 # 1. NZ/Australia (Tasman Sea focused)
@@ -113,14 +111,18 @@ listen_for_static_data = 10
 bbox = [[[-48.0, 140.0], [-10.0, 180.0]], [[22.0, 52.0], [28.0, 62.0]], [[27.0, 30.0], [33.0, 35.0]],[[34.0, -9.0], [37.0, -4.0]], [[48.0, -6.0], [52.0, 3.0]]]
 harvest_bbox = [[[-48.0, 140.0], [-10.0, 180.0]], [[22.0, 52.0], [28.0, 62.0]], [[27.0, 30.0], [33.0, 35.0]],[[34.0, -9.0], [37.0, -4.0]], [[48.0, -6.0], [52.0, 3.0]]]
 marker_color = orange
-label_fontsize = 14
-# Show only these types of vessel. Possible values: ["Tanker", "Cargo"]
-show_ship_types = ["Tanker", "Cargo"]
-# Show names for specific ship types (same options as for show_ship_types)
+label_fontsize = 12
+# Show only these classes of vessel. Possible values: ["Passenger Ship", Tanker", "Cargo"]
+# Leave as an empty list [] to show all vessels
+filter_show_ship_classes = ["Tanker"]
+# Show names for specific classes of ship (same options as for filter_show_ship_classes)
 # Leave as an empty list to suppress all names
-show_ship_names_for_types = ["Tanker"]
+filter_show_names_for_classes = ["Tanker"]
 # Filter out ships with speeds < 1 knots or flagged as moored/anchored
-show_only_active_ships = False
+filter_only_active_ships = False
+# Show ships with lengths >= this (metres 0=>no filtering)
+# Use this to filter out the small-fry
+filter_ships_minimum_length = 150
 
 [shipping_harvester]
 enabled = False

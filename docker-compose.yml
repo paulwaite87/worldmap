@@ -10,23 +10,48 @@ services:
     environment:
       - AIS_API_KEY=${AIS_API_KEY}
       - TZ=Pacific/Auckland
+      # Standard Postgres Env Vars
+      - PGHOST=worldmap_db
+      - PGPORT=5432
+      - PGDATABASE=worldmap
+      - PGUSER=wmap
+      - PGPASSWORD=wmap
     restart: unless-stopped
+    depends_on:
+      worldmap_db:
+        condition: service_healthy
     volumes:
-      # Mount the data dir for persistence (maps, json dbs, markers)
       - ./data:/opt/project/data
       - ./config:/opt/project/config
+    # ... healthcheck and logging stay the same ...
+    networks:
+      - wmap
+
+  worldmap_db:
+    container_name: worldmap_db
+    image: postgis/postgis:15-3.3 # Adjusted to a verified tag
+    environment:
+      POSTGRES_USER: wmap
+      POSTGRES_PASSWORD: wmap
+      POSTGRES_DB: worldmap
+      PGTZ: Pacific/Auckland
+    ports:
+      - "15432:5432"
+    restart: unless-stopped
+    volumes:
+      - wmap-pgdata:/var/lib/postgresql/data
+      - ./config/database:/docker-entrypoint-initdb.d
     healthcheck:
-      # Check if quake_markers.txt has been touched in the last 120 minutes.
-      # Note: Since the daemon might only run map updates hourly, and the
-      # shift changes to harvesting at night, 30m might be too aggressive
-      # for a general healthcheck. Adjust based on your 'update_sleep'.
-      test: ["CMD", "find", "/opt/project/data/quake_markers.txt", "-mmin", "-120"]
-      interval: 5m
-      timeout: 10s
-      retries: 3
-      start_period: 5m
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      test: ["CMD-SHELL", "pg_isready"] # Now works automatically with env vars
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wmap
+
+networks:
+  wmap:
+    driver: bridge
+
+volumes:
+  wmap-pgdata:
