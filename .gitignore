@@ -3,13 +3,6 @@
 data/*
 /config/worldmap.conf
 
-# Ensure the live ship data cache is ignored even if the folder is negated
-data/ship_cache.json
-
-# Do NOT ignore these specific files
-!data/ship_cache.json.example
-!data/.gitkeep
-
 # Ignore environment secrets
 .env
 .env.local
@@ -39,6 +32,7 @@ Thumbs.db
 .idea/
 *.swp
 *~
+
 
 # --- Ship Data / XPlanet Artifacts ---
 # This catches any loose index or backup files in the root
