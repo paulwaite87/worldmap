@@ -2,6 +2,7 @@
 import argparse
 import logging
 import sys
+import signal
 import asyncio
 from datetime import datetime
 from typing import Dict, Optional, Type, Tuple, List, Any
@@ -38,6 +39,10 @@ class MapBuilder:
         # Flag to indicate isobars were updated so run composite
         self.isobars_were_updated = False
 
+        # Register the signal handler for SIGUSR1
+        # In Docker/Linux, this is often signal 10
+        signal.signal(signal.SIGUSR1, self.handle_force_refresh)
+
         # Execution order registry
         self.task_registry: List[Tuple[str, Type[Any]]] = [
             ("clouds", CloudUpdater),
@@ -50,6 +55,11 @@ class MapBuilder:
             ("volcanoes", VolcanoUpdater),
             ("xplanet", XPlanetRenderer),  # always keep renderer last
         ]
+
+    def handle_force_refresh(self, signum, frame):
+        """Signal handler to reset the schedule."""
+        logger.debug("External trigger received (SIGUSR1): Resetting task timings")
+        self.last_run_times.clear()
 
     def some_tasks_ready_to_run(self) -> bool:
         for section, _ in self.task_registry:

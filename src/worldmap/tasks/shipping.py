@@ -10,6 +10,7 @@ from worldmap.lib.config import WorldMapConfig
 from worldmap.lib.shipping import (
     ShipDatabase,
     get_vessel_class,
+    get_vessel_name,
     get_vessel_dimensions,
     get_vessel_description,
     get_vessel_position,
@@ -68,6 +69,9 @@ class ShippingUpdater(Updater):
         show_names_classes = json.loads(
             self.settings.get("filter_show_names_for_classes", fallback='["Tanker"]')
         )
+        show_ships_by_name = json.loads(
+            self.settings.get("filter_show_ships_by_name", fallback='[]')
+        )
         min_length = self.settings.getint("filter_ships_minimum_length", fallback=0)
 
         label_color_default = self.settings.get("marker_color", fallback="red")
@@ -85,7 +89,11 @@ class ShippingUpdater(Updater):
                     continue
 
                 # Class Filter
-                if len(show_ship_classes) > 0 and ship_class not in show_ship_classes:
+                if show_ship_classes and ship_class not in show_ship_classes:
+                    continue
+
+                # Names filter
+                if show_ships_by_name and get_vessel_name(ship) not in show_ships_by_name:
                     continue
 
                 # Ship underway filter

@@ -8,6 +8,21 @@ from worldmap.lib.shipping import ShipDatabase
 
 logger = logging.getLogger("worldmap.harvester")
 
+# A 10-element shipping density map (Weight x Base Duration)
+# 1.0 is standard, >1.0 spends extra time, <1.0 is a quick pass
+SLICE_DENSITY_MAP = {
+    0: {"label": "Mid-Pacific (East)", "weight": 0.5},       # -180 to -144
+    1: {"label": "Eastern Pacific / Americas West", "weight": 0.7}, # -144 to -108
+    2: {"label": "Americas East / Panama / Caribbean", "weight": 1.5}, # -108 to -72
+    3: {"label": "Western Atlantic", "weight": 0.8},        # -72 to -36
+    4: {"label": "Eastern Atlantic / Gibraltar", "weight": 1.5}, # -36 to 0
+    5: {"label": "Europe / West Africa / Mediterranean", "weight": 2.0}, # 0 to 36
+    6: {"label": "Middle East / Suez / Hormuz / Aden", "weight": 2.0}, # 36 to 72
+    7: {"label": "Indian Ocean / Bay of Bengal", "weight": 1.0}, # 72 to 108
+    8: {"label": "SE Asia / Malacca / South China Sea", "weight": 2.0}, # 108 to 144
+    9: {"label": "Australia / NZ / Japan / West Pacific", "weight": 1.2}, # 144 to 180
+}
+
 
 class ShipHarvester:
     def __init__(self, config_path):
@@ -84,49 +99,63 @@ class ShipHarvester:
             logger.error(f"Connection error for region {label}: {e}")
 
     async def run(self):
+        import random
         self.load_settings()
         db = ShipDatabase()
 
         url = self.settings.get("url")
         api_key = self.settings.get("api_key")
-        listen_duration = self.settings.getint("listen_duration", fallback=300)
+
+        # Base duration (e.g., 300s). This will be multiplied by the weight.
+        base_duration = self.settings.getint("listen_duration", fallback=300)
         sleep_between_runs = self.settings.getint("sleep_interval", fallback=60)
         track_expiry = self.settings.getint("vessel_track_expiry_days", fallback=30)
 
-        # Calculate harvest chunks based on worldmap.conf setting
-        num_chunks = self.settings.getint("harvest_chunks", fallback=12)
-        slice_width = 360.0 / num_chunks
+        num_chunks = 10
+        slice_width = 36.0
 
         while True:
-            logger.info("Ship-harvester Service: Starting global rotation")
+            logger.info("Ship-harvester Service: Starting weighted global rotation")
             start_total = db.get_current_ship_total()
 
             try:
-                # 1. Maintenance: Keep the database lean
                 db.prune_vessel_tracks(track_expiry)
 
-                # 2. Sequential Global Sweep
-                for i in range(num_chunks):
+                # Random starting slice
+                start_offset = random.randrange(num_chunks)
+                chunk_indices = [(start_offset + i) % num_chunks for i in range(num_chunks)]
+
+                for i in chunk_indices:
+                    # Get slice metadata
+                    meta = SLICE_DENSITY_MAP.get(i)
+                    weight = meta["weight"]
+
+                    # Calculate dynamic duration
+                    effective_duration = int(base_duration * weight)
+
                     lon_start = -180.0 + (i * slice_width)
                     lon_end = lon_start + slice_width
 
-                    # Final slice safety check to ensure full 180.0 coverage
                     if i == num_chunks - 1:
                         lon_end = 180.0
 
                     chunk_bbox = [[-90.0, lon_start], [90.0, lon_end]]
-                    chunk_label = f"Slice {i + 1}/{num_chunks} ({lon_start:.1f}° -> {lon_end:.1f}°)"
+                    chunk_label = f"Slice {i} [{meta['label']}]"
 
-                    await self.harvest_region(db, url, api_key, chunk_bbox, listen_duration, chunk_label)
+                    # Log the specific duration for transparency in journalctl
+                    logger.info(f"{chunk_label}")
+
+                    await self.harvest_region(
+                        db, url, api_key, chunk_bbox, effective_duration, chunk_label
+                    )
 
                 end_total = db.get_current_ship_total()
-                logger.info(f"Rotation complete. Added {end_total - start_total} new vessels. Total: {end_total}")
+                logger.info(f"Rotation complete. Added {end_total - start_total} new vessels.")
 
             except Exception as e:
                 logger.error(f"Unexpected error in harvester loop: {e}")
                 await asyncio.sleep(30)
 
-            logger.debug(f"Cooling down for {sleep_between_runs}s before next rotation")
             await asyncio.sleep(sleep_between_runs)
 
 

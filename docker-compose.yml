@@ -1,7 +1,7 @@
 services:
   # Listens to AIS stream 24/7
   harvester:
-    container_name: worldmap_harvester
+    container_name: harvester
     image: worldmap:latest
     build:
       context: .
@@ -32,8 +32,8 @@ services:
       - wmap
 
   # Manages map assets and rendering on a schedule
-  builder:
-    container_name: worldmap_builder
+  map_builder:
+    container_name: map_builder
     image: worldmap:latest
     build:
       context: .

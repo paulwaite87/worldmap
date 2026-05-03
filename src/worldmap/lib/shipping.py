@@ -288,9 +288,9 @@ class ShipDatabase:
         else:
             sql = """
                   SELECT * \
-                  FROM ships
-                  WHERE last_position_update > NOW() - INTERVAL '%s days'
-                    AND geom IS NOT NULL
+                  FROM ships s
+                  WHERE s.last_position_update > NOW() - INTERVAL '%s days'
+                    AND s.geom IS NOT NULL
                     AND s.lat IS NOT NULL
                     AND s.lon IS NOT NULL; \
                   """
