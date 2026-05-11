@@ -174,9 +174,6 @@ class MapData:
         self.refresh()
 
     def refresh(self):
-        """Refreshes our data from the latest settings"""
-        self.config.load()
-
         # Acquire the target geometry
         common_settings = self.config.get_section("common")
         target_geometry = common_settings.get("target_geometry", fallback="2048x1024")

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class CompositeUpdater(Updater):
     """
-    Joins the enabled weather layers (Clouds, Precipitation, Isobars, Wind) into a single map.
+    Joins the enabled weather layers (SST, Clouds, Precipitation, Isobars, Wind) into a single map.
     Layers are applied dynamically bottom-to-top based on configuration.
     """
 
@@ -31,11 +31,13 @@ class CompositeUpdater(Updater):
         else:
             self.clouds_settings = self.config.get_section("clouds")
 
+        self.sst_settings = self.config.get_section("sst")
         self.precip_settings = self.config.get_section("precipitation")
         self.isobar_settings = self.config.get_section("isobars")
         self.wind_settings = self.config.get_section("wind")
 
         # Enabled flags
+        self.sst_enabled = self.config.section_enabled("sst")
         self.clouds_enabled = self.clouds_settings.getboolean("enabled", fallback=False)
         self.precip_enabled = self.config.section_enabled("precipitation")
         self.isobars_enabled = self.config.section_enabled("isobars")
@@ -49,26 +51,17 @@ class CompositeUpdater(Updater):
         threshold = self.clouds_settings.getint("threshold", fallback=0)
         gamma = self.clouds_settings.getfloat("gamma", fallback=1.0)
 
-        # Convert to grayscale (L) to use as a mask
         cloud_mask = cloud_img.convert("L")
 
-        # Apply Gamma and Threshold via a Lookup Table (LUT)
-        # Gamma < 1.0 makes clouds more transparent/wispy
-        # Threshold > 0 clips out the dark haze
         lut = [
             int(pow(i / 255.0, 1.0 / gamma) * 255.0) if i >= threshold else 0
             for i in range(256)
         ]
         cloud_mask = cloud_mask.point(lut)
 
-        # Create a fully transparent base (Alpha = 0)
-        # This ensures thresholded areas let the NASA land map show through
+        # Fully transparent base
         base = Image.new("RGBA", cloud_img.size, (0, 0, 0, 0))
-
-        # Create the solid white cloud color
         white_clouds = Image.new("RGBA", cloud_img.size, (255, 255, 255, 255))
-
-        # Paste white onto the transparent base using our corrected mask
         base.paste(white_clouds, (0, 0), mask=cloud_mask)
 
         return base
@@ -83,6 +76,7 @@ class CompositeUpdater(Updater):
             logger.debug(f"Creating weather map image => {self.output_path}")
 
             # Source paths
+            sst_map_path = str(os.path.join(self.workdir, self.sst_settings.get("outfile", "")))
             cloud_map_path = str(os.path.join(self.workdir, self.clouds_settings.get("outfile", "")))
             precip_map_path = str(os.path.join(self.workdir, self.precip_settings.get("outfile", "")))
             isobar_map_path = str(os.path.join(self.workdir, self.isobar_settings.get("outfile", "")))
@@ -93,7 +87,6 @@ class CompositeUpdater(Updater):
             # Prepare the cloud base if enabled
             if self.clouds_enabled:
                 p = Path(cloud_map_path)
-                # Save the intermediate regional file as .png to preserve the threshold mask
                 regional_cloud_map = str(os.path.join(
                     self.workdir,
                     "data",
@@ -105,7 +98,6 @@ class CompositeUpdater(Updater):
                 if raw_clouds_image:
                     transparent_clouds = self._apply_cloud_transparency(raw_clouds_image)
                     logger.debug(f"Saving regional cloud maps in {regional_cloud_map}")
-                    # CRITICAL: Save as PNG
                     transparent_clouds.save(regional_cloud_map, "PNG")
                 else:
                     logger.error("Failed to generate regional cloud image.")
@@ -116,7 +108,12 @@ class CompositeUpdater(Updater):
             sys.exit(1)
 
         # --- Dynamic Compositing Logic ---
+        # Note the order: SST is at the bottom, Wind is at the top.
         layers = []
+
+        if self.sst_enabled:
+            layers.append(("SST", sst_map_path))
+
         if self.clouds_enabled:
             layers.append(("Clouds", regional_cloud_map))
 
@@ -139,7 +136,14 @@ class CompositeUpdater(Updater):
                 logger.error(f"Source file missing ({label}): {path}")
                 sys.exit(1)
 
-        # Compositing process
+        # Case 1: Only a single layer is enabled
+        if len(layers) == 1:
+            label, path = layers[0]
+            logger.debug(f"Only {label} enabled. Copying to output.")
+            shutil.copyfile(path, self.output_path)
+            return
+
+        # Case 2: Compositing process
         try:
             logger.debug(f"Compositing layers: {[l[0] for l in layers]}...")
 
@@ -156,10 +160,10 @@ class CompositeUpdater(Updater):
                         if overlay_img.size != bg_img.size:
                             overlay_img = overlay_img.resize(bg_img.size, Image.Resampling.LANCZOS)
 
-                        # Use the overlay's own alpha channel as the mask
+                        # Overlaying using the image's own alpha channel
                         bg_img.paste(overlay_img, (0, 0), mask=overlay_img)
 
-                # Save final output as PNG for xplanet to handle correctly
+                # Save final output as PNG
                 bg_img.save(self.output_path, "PNG")
 
             logger.debug(f"Successfully created composite: {self.output_path}")

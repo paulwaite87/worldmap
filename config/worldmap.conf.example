@@ -215,7 +215,7 @@ marker_files = ["worldmap_markers.txt"]
 # or it can define a bounding box in format:
 # [lon_top_left, lat_top_left, lon_bottom_right, lat_bottom_right]
 # region = [63.131759, -57.173648, 190.337125, 0.239941]
-# Handy tool for definining your own regions: https://tools.mofei.life/bbox
+# Handy tool for defining your own regions: https://tools.mofei.life/bbox
 # It provides a bounding box in the same format as above.
 # Regions defined for you out-of-the-box are:
 # NZ, NZ_Aus, Suez_Canal, English_Channel, Strait_of_Hormuz, Singapore,

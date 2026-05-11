@@ -12,6 +12,7 @@ class WorldMapConfig:
         self.config = configparser.ConfigParser()
         # Track the modification time to detect external changes
         self._last_mtime = self._get_current_mtime()
+        self.has_changed = False
         self.load()
 
     def _get_current_mtime(self):
@@ -21,10 +22,10 @@ class WorldMapConfig:
         except OSError:
             return 0
 
-    def is_changed(self):
+    def check_if_changed(self) -> bool:
         """
         Returns True if the config file has been modified since the last check.
-        Updates the internal timestamp reference.
+        Updates the internal timestamp reference, and stores the result.
         """
         current_mtime = self._get_current_mtime()
         if current_mtime > self._last_mtime:
@@ -40,7 +41,8 @@ class WorldMapConfig:
         self.config.clear()
         self.config.read(self.config_path)
         self._inject_secrets()
-        logger.debug(f"Configuration loaded/refreshed from {self.config_path}")
+        self.has_changed = self.check_if_changed()
+        logger.debug(f"Configuration loaded/refreshed from {self.config_path} (changed={self.has_changed})")
 
     def _inject_secrets(self):
         """Silently injects API keys from environment into the config object."""

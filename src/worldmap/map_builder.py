@@ -18,6 +18,7 @@ from worldmap.tasks.clouds_nasa import NasaCloudUpdater
 from worldmap.tasks.isobars import IsobarUpdater
 from worldmap.tasks.wind import WindUpdater
 from worldmap.tasks.precipitation import PrecipitationUpdater
+from worldmap.tasks.sst import SSTUpdater
 from worldmap.tasks.composite import CompositeUpdater
 from worldmap.tasks.storms import StormUpdater
 from worldmap.tasks.quakes import QuakeUpdater
@@ -32,7 +33,6 @@ class MapBuilder:
     def __init__(self, config_path: str):
         self.config = WorldMapConfig(config_path)
         self.map_data = MapData(self.config)
-        self.config_changed = False
         self.starting_up = True
 
         # Explicitly typed dictionary for tracking task completion
@@ -56,6 +56,7 @@ class MapBuilder:
             ("isobars", IsobarUpdater),
             ("wind", WindUpdater),
             ("precipitation", PrecipitationUpdater),
+            ("sst", SSTUpdater),
             ("composite", CompositeUpdater),
             ("storms", StormUpdater),
             ("quakes", QuakeUpdater),
@@ -90,7 +91,7 @@ class MapBuilder:
             return False
 
         # Refresh everything if config changed
-        if self.starting_up or self.config_changed:
+        if self.starting_up or self.config.has_changed:
             return True
 
         # Composite produces the weather image from clouds and/or isobars,
@@ -129,9 +130,8 @@ class MapBuilder:
             self.map_data.refresh()
             self.map_updated = False
             self.weather_image_updated = False
-            self.config_changed = self.config.is_changed()
 
-            if self.starting_up or self.config_changed or self.tasks_ready_to_run():
+            if self.starting_up or self.config.has_changed or self.tasks_ready_to_run():
                 logger.info("Map-builder scheduler run started")
 
                 for section, task_class in self.task_registry:
@@ -154,7 +154,14 @@ class MapBuilder:
                             self.map_updated = True
 
                             # Will allow composite overlay to update
-                            if section in ["clouds", "clouds_nasa", "isobars", "wind", "precipitation"]:
+                            if section in [
+                                "clouds",
+                                "clouds_nasa",
+                                "isobars",
+                                "wind",
+                                "precipitation",
+                                "sst"
+                            ]:
                                 self.weather_image_updated = True
 
                         except Exception as e:
