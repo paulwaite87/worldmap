@@ -81,12 +81,11 @@ class SSTUpdater(Updater):
         vmin = self.settings.getint("min_c", fallback=0)
         vmax = self.settings.getint("max_c", fallback=32)
 
-        # Professional color mapping dictionary
         palettes = {
-            "thermal": "magma",  # Dark, high-tech glow
-            "vivid": "turbo",  # High-contrast rainbow
-            "deep": "viridis",  # Clean, easy-to-read green/blue
-            "ocean": "inferno"  # Firey oranges and blacks
+            "thermal": "magma",
+            "vivid": "turbo",
+            "deep": "viridis",
+            "ocean": "inferno"
         }
 
         cmap_name = palettes.get(palette_key, "magma")
@@ -119,7 +118,7 @@ class SSTUpdater(Updater):
         lons = ds.Longitude.values if 'Longitude' in ds.coords else ds.lon.values
         lats = ds.Latitude.values if 'Latitude' in ds.coords else ds.lat.values
 
-        # Handle International Date Line wrap-around for the Tasman Sea/Pacific
+        # Handle International Date Line wrap-around logic
         if bbox and bbox[0] < 0:
             lons = ((lons + 180) % 360) - 180
             idx = np.argsort(lons)
@@ -127,24 +126,37 @@ class SSTUpdater(Updater):
 
         # --- Figure Setup ---
         if bbox:
-            width_deg, height_deg = abs(bbox[2] - bbox[0]), abs(bbox[3] - bbox[1])
-            fig = plt.figure(figsize=(plot_target_width, plot_target_width / (width_deg / height_deg)), dpi=100)
+            width_deg = abs(bbox[2] - bbox[0])
+            height_deg = abs(bbox[3] - bbox[1])
+            # Use height/width ratio to prevent canvas distortion
+            fig = plt.figure(figsize=(plot_target_width, plot_target_width * (height_deg / width_deg)), dpi=100)
         else:
             fig = plt.figure(figsize=(plot_target_width, float(self.target_height) / 100), dpi=100)
 
-        ax = plt.axes(projection=ccrs.PlateCarree())
+        # Use PlateCarree but center it at 180 to handle the NZ/Tasman region seamlessly
+        projection = ccrs.PlateCarree(central_longitude=180)
+        ax = plt.axes(projection=projection)
+
+        # Force the extent to your specific BBOX immediately
         if bbox:
             ax.set_extent([bbox[0], bbox[2], bbox[1], bbox[3]], crs=ccrs.PlateCarree())
         else:
             ax.set_global()
 
         # --- The Render ---
+        # transform=ccrs.PlateCarree() tells Matplotlib that the DATA is in standard +/-180,
+        # even though the AXES is centered at 180.
         mesh = ax.pcolormesh(lons, lats, sst_c,
                              cmap=plt.get_cmap(cmap_name),
                              alpha=alpha,
                              shading='nearest',
                              transform=ccrs.PlateCarree(),
                              vmin=vmin, vmax=vmax)
+
+        # RE-ASSERT EXTENT: This prevents the "Suva Truncation" bug where the data
+        # footprint tries to redefine the image boundaries.
+        if bbox:
+            ax.set_extent([bbox[0], bbox[2], bbox[1], bbox[3]], crs=ccrs.PlateCarree())
 
         # --- Clean up & Save ---
         ax.set_frame_on(False)
@@ -155,25 +167,8 @@ class SSTUpdater(Updater):
 
         plt.savefig(self.output_path, transparent=True, bbox_inches=None, pad_inches=0)
         plt.close(fig)
-        ds.close()  # Ensure file handle is closed for persistence logic
+        ds.close()
         logger.debug(f"SST plot completed using {cmap_name}")
-
-    def run(self):
-        """Orchestrates the SST update with bandwidth-saving logic."""
-        self.exit_if_disabled()
-
-        # Check if we need to download/update the NetCDF
-        new_data_downloaded = self.download_data()
-
-        # Check if the final output PNG already exists
-        png_exists = os.path.exists(self.output_path)
-
-        # Only plot if we have new data OR the PNG is missing
-        if new_data_downloaded or not png_exists or self.config.has_changed:
-            logger.info("Generating SST plot...")
-            self.plot()
-        else:
-            logger.info("SST PNG already exists and data hasn't changed. Skipping plot.")
 
 
 if __name__ == "__main__":
