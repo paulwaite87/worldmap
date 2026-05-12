@@ -18,7 +18,7 @@ target_geometry = 4096x2048
 # Clouds sourced via https://clouds.matteason.co.uk/
 # Codebase here https://github.com/jmozmoz/cloudmap
 # High quality images and kept reasonably up to date
-enabled = True
+enabled = False
 outfile = data/cloud_map.jpg
 force = False
 # threshold: 0-255 (e.g., 20 removes dim haze)
@@ -40,17 +40,17 @@ gamma = 0.7
 runs_per_day = 8
 
 [isobars]
-enabled = True
+enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/isobars.png
 isobar_color = White
-label_fontsize = 8
+label_fontsize = 10
 # Optional: isobar text labels outlined for better legibility
 label_outline = True
 runs_per_day = 8
 
 [wind]
-enabled = True
+enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/wind.png
 vector_color = yellow
@@ -63,17 +63,30 @@ barb_length_step = 0.8
 barb_density = 30.0
 
 [precipitation]
-enabled = True
+enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/precipitation.png
 # Minimum rain rate to display (mm/hr)
 min_mm_hr = 0.4
 # Overall transparency (0.0 to 1.0)
-alpha = 0.4
+alpha = 0.3
 # Options: standard, ocean_blue, or high_contrast
 palette = high_contrast
 # GFS forecast hour (usually 3 or 6 for current conditions)
 forecast_hour = 3
+
+[sst]
+# Sea Surface Temperatures
+enabled = True
+url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod
+outfile = data/sst.png
+# Overall transparency (0.0 to 1.0)
+alpha = 0.4
+# Options: thermal, vivid, deep, or ocean
+palette = thermal
+# Max/min temperatures
+min_c = 0
+max_c = 32
 
 [composite]
 # Creates a composite image of clouds, isobars and wind
