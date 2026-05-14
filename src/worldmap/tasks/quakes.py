@@ -59,22 +59,3 @@ class QuakeUpdater(Updater):
         except Exception as e:
             logger.error(f"Unexpected error in quakes task: {e}")
             sys.exit(1)
-
-
-def main():
-    import argparse
-    from worldmap.lib.logging import setup_logging
-
-    setup_logging()
-
-    parser = argparse.ArgumentParser(description="WorldMap Quake Marker Updater")
-    parser.add_argument("--config", required=True, help="Path to worldmap.conf")
-    args = parser.parse_args()
-
-    config = WorldMapConfig(args.config)
-    updater = QuakeUpdater(config)
-    updater.run()
-
-
-if __name__ == "__main__":
-    main()

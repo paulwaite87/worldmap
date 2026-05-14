@@ -134,6 +134,8 @@ class PrecipitationUpdater(Updater):
 
         plot.save_figure(self.output_path)
         ds.close()
+        logger.debug("Finished Preciptation plot...saving")
+
 
     def run(self):
         self.exit_if_disabled()

@@ -138,16 +138,3 @@ class StormUpdater(Updater):
 
         except Exception as e:
             logger.error(f"Error processing storm markers: {e}")
-
-
-if __name__ == "__main__":
-    import argparse
-    from worldmap.lib.logging import setup_logging
-
-    setup_logging()
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config", required=True)
-    args = parser.parse_args()
-    config = WorldMapConfig(args.config)
-    updater = StormUpdater(config, None)
-    updater.run()

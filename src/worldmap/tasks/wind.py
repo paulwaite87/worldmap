@@ -161,6 +161,8 @@ class WindUpdater(Updater):
 
         plot.save_figure(self.output_path)
         ds.close()
+        logger.debug("Finished Wind plot...saving")
+
 
     def run(self):
         self.exit_if_disabled()

@@ -146,6 +146,8 @@ class IsobarUpdater(Updater):
 
         plot.save_figure(self.output_path)
         ds.close()
+        logger.debug("Finished Isobars plot...saving")
+
 
     def run(self):
         self.exit_if_disabled()

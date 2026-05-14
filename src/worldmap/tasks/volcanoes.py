@@ -90,22 +90,3 @@ class VolcanoUpdater(Updater):
                         count += 1
 
         logger.debug(f"Volcanoes update complete. Updated {count} volcanoes.")
-
-
-def main():
-    import argparse
-    from worldmap.lib.logging import setup_logging
-
-    setup_logging()
-
-    parser = argparse.ArgumentParser(description="WorldMap Volcano Marker Updater")
-    parser.add_argument("--config", required=True, help="Path to worldmap.conf")
-    args = parser.parse_args()
-
-    config = WorldMapConfig(args.config)
-    updater = VolcanoUpdater(config)
-    updater.run()
-
-
-if __name__ == "__main__":
-    main()
