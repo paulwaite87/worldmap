@@ -90,23 +90,26 @@ enabled = True
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/precipitation.png
 # Minimum rain rate to display (mm/hr)
-min_mm_hr = 0.4
+min_mm_hr = 0.6
 # Overall transparency (0.0 to 1.0)
-alpha = 0.7
+alpha = 0.6
 # Options: standard, ocean_blue, or high_contrast
-palette = high_contrast
+palette = standard
 # GFS forecast hour (usually 3 or 6 for current conditions)
 forecast_hour = 3
 runs_per_day = 8
 
 [lightning]
-enabled = True
+# Uses the data acquired by the [weather_scanner] (see below section)
+# hence disabled until you get an API Key for it.
+enabled = False
 outfile = markers/lightning.txt
-expiry_hours = 4
+expiry_hours = 1
 runs_per_day = 24
 
 [sst]
-# Sea Surface Temperatures
+# Sea Surface Temperatures. An interesting layer but best used with
+# other layers disabled, so you get the full effect.
 enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/rtofs/prod
 outfile = data/sst.png
@@ -180,7 +183,7 @@ erupt_date_codes = ["D1"]
 runs_per_day = 1
 
 [shipping]
-enabled = True
+enabled = False
 outfile = data/ship_markers.txt
 marker_color = orange
 label_fontsize = 12
@@ -193,9 +196,9 @@ label_fontsize = 12
 # 'C' - Cargo. Green = loaded; Red = unloaded since last info
 # 'T' - Tanker. Red = loaded; Lime green = unloaded
 # Purple discs are for Passenger ships and all other vessel types
-show_ship_icons = default
+#show_ship_icons = default
 #show_ship_icons = Discs
-#show_ship_icons = Arrows
+show_ship_icons = Arrows
 # Show only these classes of vessel. Possible values: ["Passenger", Tanker", "Cargo"]
 # Leave as an empty list [] to show all vessels
 filter_show_ship_classes = []
@@ -225,7 +228,7 @@ runs_per_day = 24
 # This collector acquires ship data and stores it in the db, listening to AIS in
 # an endless loop. The harvesting is done globally in 10 longitudinal 'slices'.
 # This stored data is used by the map builder when displaying ships on the map.
-enabled = True
+enabled = False
 # Needs an API Key in your .env file; see https://aisstream.io/documentation
 url = wss://stream.aisstream.io/v0/stream
 # Time to listen for data broadcasts
@@ -241,7 +244,8 @@ vessel_track_expiry_days = 14
 log_level = INFO
 
 [weather_scanner]
-enabled = True
+# Needs an API Key in your .env file; see https://openweathermap.org
+enabled = False
 url = https://demo.openweathermap.org/lightning/1.0/data
 expiry_hours = 24
 # Level for logging: DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -250,7 +254,7 @@ log_level = INFO
 [map_builder]
 enabled = True
 # Level for logging: DEBUG, INFO, WARNING, ERROR, CRITICAL
-log_level = INFO
+log_level = DEBUG
 
 [xplanet]
 enabled = True

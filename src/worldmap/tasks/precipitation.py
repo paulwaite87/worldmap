@@ -7,6 +7,8 @@ import numpy as np
 import xarray as xr
 import matplotlib.colors as mcolors
 import cartopy.crs as ccrs
+
+from scipy.ndimage import gaussian_filter
 from datetime import datetime, timedelta, timezone
 
 # Internal imports
@@ -91,47 +93,97 @@ class PrecipitationUpdater(Updater):
                 f.write(chunk)
 
     def plot(self):
-        """Renders the precipitation transparent PNG with alignment fixes."""
-        logger.debug(f"Plotting precipitation to {self.output_path}")
+        """Renders precipitation with early clipping to prevent memory exhaustion."""
+        from scipy.interpolate import RegularGridInterpolator
+        import gc  # Garbage collector
+
+        logger.debug(f"Plotting precipitation for {self.map_data.region.region_identifier}")
 
         min_rate = self.settings.getfloat("min_mm_hr", fallback=0.1)
         alpha = self.settings.getfloat("alpha", fallback=0.5)
         palette_name = self.settings.get("palette", fallback="standard")
 
-        bbox = self.map_region_bbox
-        plot_target_width = float(self.target_width) / 100
-        plot_target_height = float(self.target_height) / 100
-
+        # 1. Load Dataset and Clip Immediately
         ds = xr.open_dataset(self.grib_path, engine="cfgrib")
-        prate = ds["prate"].values.squeeze() * 3600.0  # kg/m^2/s to mm/hr
-        lons, lats = ds.longitude.values, ds.latitude.values
 
-        # Standardize longitudes to -180..180 for reliable bbox clipping
-        lons = ((lons + 180) % 360) - 180
-        idx = np.argsort(lons)
-        lons, prate = lons[idx], prate[:, idx]
+        # Standardize longitudes to -180..180
+        ds = ds.assign_coords(longitude=(((ds.longitude + 180) % 360) - 180))
+        ds = ds.sortby("longitude")
 
+        # Define BBox with a small buffer for smooth edges
+        lon_min, lat_min, lon_max, lat_max = self.map_region_bbox
+        buf = 1.0
+
+        # SLICE EARLY: This is the primary memory-saving step
+        # GFS lats are North to South, so slice is (lat_max, lat_min)
+        ds_clipped = ds.sel(
+            latitude=slice(lat_max + buf, lat_min - buf),
+            longitude=slice(lon_min - buf, lon_max + buf)
+        )
+
+        prate = ds_clipped["prate"].values.squeeze() * 3600.0
+        lons = ds_clipped.longitude.values
+        lats = ds_clipped.latitude.values
+
+        # Explicit cleanup of the large dataset
+        ds.close()
+        del ds
+        gc.collect()
+
+        # 2. Interpolation on the clipped subset only
+        # 0.05 step is ~5km resolution, 0.02 is ~2km
+        step = 0.02
+        new_lats = np.arange(lats.min(), lats.max() + step, step)
+        new_lons = np.arange(lons.min(), lons.max() + step, step)
+
+        # Handle latitude ordering for Interpolator (must be strictly increasing)
+        if lats[0] > lats[-1]:
+            lats_inc, prate_inc = lats[::-1], prate[::-1, :]
+        else:
+            lats_inc, prate_inc = lats, prate
+
+        fn = RegularGridInterpolator(
+            (lats_inc, lons),
+            prate_inc,
+            bounds_error=False,
+            fill_value=0
+        )
+
+        mesh_lats, mesh_lons = np.meshgrid(new_lats, new_lons, indexing='ij')
+        prate_smooth = fn((mesh_lats, mesh_lons))
+
+        # 3. Setup Plotting
         plot = Plot(self.map_data.region)
         plot.get_figure()
 
-        # Colormap setup
-        levels = [min_rate, 0.5, 2.0, 5.0, 10.0, 25.0, 50.0, 100.0]
+        levels = [0.1, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 15.0, 20.0, 30.0, 50.0, 100.0]
         base_colors = self.PALETTES.get(palette_name, self.PALETTES["standard"])
         rgba_colors = [(*c, alpha) for c in base_colors]
 
-        cmap = mcolors.ListedColormap(rgba_colors)
+        cmap = mcolors.LinearSegmentedColormap.from_list("smooth_precip", rgba_colors, N=256)
         norm = mcolors.BoundaryNorm(levels, cmap.N)
 
-        plot.ax.contourf(lons, lats, prate,
-                    levels=levels,
-                    cmap=cmap,
-                    norm=norm,
-                    transform=ccrs.PlateCarree(),
-                    extend='max')
+        # 4. Render
+        # Sigma of 1.0 to 1.5 is usually the "sweet spot" for GFS data
+        prate_smooth = gaussian_filter(prate_smooth, sigma=1.2)
+        plot.ax.contourf(
+            new_lons, new_lats, prate_smooth,
+            levels=levels,
+            cmap=cmap,
+            norm=norm,
+            transform=ccrs.PlateCarree(),
+            extend='max',
+            antialiased=True
+        )
 
         plot.save_figure(self.output_path)
-        ds.close()
-        logger.debug("Finished Preciptation plot...saving")
+
+        # Final cleanup
+        plt_close = getattr(plot, 'close', None)
+        if callable(plt_close):
+            plt_close()
+
+        logger.debug(f"Finished Precipitation plot. Memory cleared.")
 
 
     def run(self):
