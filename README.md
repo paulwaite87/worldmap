@@ -9,7 +9,11 @@ render it all as an image of The World or part of it, for your desktop.
 There is also a daemon which will monitor the folder this image is generated in, and update your desktop wallpaper
 with what is essentially a live view of what's happening on the planet.
 
+### Global example
 ![World Map Example](docs/worldmap-example.jpg)
+
+### Regional example
+![Regional Map Example](docs/worldmap-region-example.jpg)
 
 ## How do I use this?
 
