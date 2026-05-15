@@ -72,8 +72,8 @@ database will be seeded with a few regions, which can be used to restrict where 
 ships on the map. That can be useful if you have a lot of vessels being displayed. You can add
 as many regions as you want.
 
-If this all worked as it should, you will see the logs showing that both the `harvester` and
-the `map_builder` are working.
+If this all worked as it should, you will see the logs showing that the `shipping_collector`,
+`weather_scanner` and the `map_builder` are all working.
 
 A healthy repeating cycle will look something like this in the logs:
 
@@ -126,7 +126,7 @@ The process of obtaining the API Key is easy once you are signed in. There is a 
 and you can create one there. Copy the key, and then back in the root directory copy `.env.tmpl` 
 to a new file named `.env`. Edit that file and replace the `AIS_API_KEY` placeholder there
 with your newly minted API Key. You will now be able to edit `config/worldmap.conf` and set
-the `enabled` flags to True in the `[shipping]` and `[shipping_harvester]` sections.
+the `enabled` flags to True in the `[shipping]` and `[shipping_collector]` sections.
 
 ### Obtaining an API Key for Weather/Lightning Strikes
 This is for the `weather_scanner` and it's a similar deal, but also easy. You just need to
@@ -160,10 +160,10 @@ lanes and the area of ocean it's looking at.
 
 At any given instant either a `ShipStaticData` or `PositionReport` message might come in. If it's
 a `PositionReport` the message is fairly specific to position, heading, speed etc. and contains
-no details about the ship itself. The `harvester` will look for an existing `ships` record in
-our database with the same `mmsi` identifier, and if found add the new position info. It also 
-logs the position in the tracking table `ship_position` so we can display vessel tracks. If 
-it doesn't find an existing `ships` record it creates a `shadow` record with scant data about 
+no details about the ship itself. The `shipping_collector` will look for an existing `ships`
+record in our database with the same `mmsi` identifier, and if found add the new position info.
+It also logs the position in the tracking table `ship_position` so we can display vessel tracks.
+If it doesn't find an existing `ships` record it creates a `shadow` record with scant data about
 the ship, basically just the name and the `mmsi` identifier. At some point we would hope to 
 back-fill that data when a `ShipStaticData` is acquired for it.
 
