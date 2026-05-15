@@ -150,13 +150,11 @@ IMO number (International Maritime Organization number). This message is broadca
 frequently, but the data is extremely useful to identify the type of vessel and its current 
 loading state (draught).
 
-The `shipping_collector` is specific to shipping data, and repeatedly listens for the relatively
-infrequent `ShipStaticData` messages and the more frequent `PositionReport` messages.
-
-It will gradually populate your database `ships` table with them. It does this by slicing the 
-globe up into 10 segments by longitude, and then listening in each slice defined as a bounding box. 
-The listen duration varies according to how busy each slice is expected to be, based on shipping
-lanes and the area of ocean it's looking at.
+The `shipping_collector` listens for both types of message and will gradually populate your
+database `ships` table with them. It does this by slicing the globe up into 10 segments by
+longitude, and then listening in each slice defined as a bounding box. The listen duration
+varies according to how busy each slice is expected to be, based on shipping lanes and the
+area of ocean it's looking at.
 
 At any given instant either a `ShipStaticData` or `PositionReport` message might come in. If it's
 a `PositionReport` the message is fairly specific to position, heading, speed etc. and contains
