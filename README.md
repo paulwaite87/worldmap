@@ -181,6 +181,7 @@ Apart from shipping there are, of course, other elements to the map display. The
 * Isobars
 * Rainfall
 * Wind
+* Sea surface temperature
 * Lightning strikes
 * Active storms
 * Earthquakes
