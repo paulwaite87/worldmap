@@ -3,7 +3,7 @@ set -e
 
 # Define paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_DIR="$SCRIPT_DIR/.venv_wallpaper"
+VENV_DIR=~/virtualenvs/worldmap_venv
 IMAGE_DIR="$SCRIPT_DIR/data"
 
 # Setup/Update Virtual Environment

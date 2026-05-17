@@ -16,7 +16,7 @@
 # Regions defined for you out-of-the-box are:
 # NZ, NZ_Aus, Suez_Canal, English_Channel, Strait_of_Hormuz, Singapore,
 # Saudi_Arabia, Mediterranean, Panama_Canal, Ukraine, Europe
-region =
+region = NZ
 # Set to the geometry (graphics resolution) of your desktop. The
 # final render of the map image will use this.
 desktop_geometry = 1920x1200
@@ -37,9 +37,9 @@ workdir = .
 log_level = DEBUG
 
 [clouds]
-# Clouds sourced via https://clouds.matteason.co.uk/
+# High quality cloud images refreshed every 3 hours. Sourced via
+# https://clouds.matteason.co.uk/
 # Codebase here https://github.com/jmozmoz/cloudmap
-# High quality images and kept reasonably up to date
 enabled = True
 outfile = data/cloud_map.jpg
 force = False
@@ -62,7 +62,9 @@ gamma = 0.4
 runs_per_day = 12
 
 [isobars]
-enabled = False
+# An excellent overall picture of what the air pressure map is in
+# the region being viewed. A must-have for weather info.
+enabled = True
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/isobars.png
 isobar_color = White
@@ -72,6 +74,8 @@ label_outline = False
 runs_per_day = 12
 
 [wind]
+# Provides a grid of 'barbs' showing wind direction and with
+# barb length proportional to wind speed.
 enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/wind.png
@@ -86,7 +90,9 @@ barb_density = 30.0
 runs_per_day = 8
 
 [precipitation]
-enabled = False
+# A.k.a "rain radar". Gives a great picture of where the wet
+# stuff is falling and at what rate.
+enabled = True
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/precipitation.png
 # Minimum rain rate to display (mm/hr)
@@ -142,9 +148,9 @@ key_position = bottom-left
 runs_per_day = 2
 
 [waves]
-# Paints the region with colors according to wave height
-# with arrows indicating direction. Best used with other
-# layers which paint the region disabled (eg. sst)
+# Paints the region with colors according to wave height with
+# arrows indicating direction. Best used with other layers
+# which paint the region disabled (eg. sst)
 enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/waves.png
@@ -164,12 +170,14 @@ key_position = top-right
 runs_per_day = 2
 
 [temperature]
+# Air temperature map which covers the entire region. Best used
+# with other layers which paint the region disabled (eg. sst)
 enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/temperature.png
 # Mode: absolute or anomaly
-# Air Temperature anomalies are calculated as deviation from the
-# mean temperature across the region being viewed right now,
+# Air temperature anomalies are calculated as deviation from the
+# mean temperature across the region being viewed right now. Ie.
 # not deviations from 'expected' or historical data.
 mode = absolute
 # Options: global_thermal, extreme_contrast, twilight_gradient
@@ -185,7 +193,9 @@ runs_per_day = 8
 
 [storms]
 enabled = True
+# The main storm tracking site; storm name and current and past locations
 ibtracs_url = https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/
+# Two alternatives for storm track forecasting
 jtwc_url = https://www.ssd.noaa.gov/PS/TROP/DATA/ATCF/JTWC/
 nhc_url = https://ftp.nhc.noaa.gov/atcf/fst/
 outfile = data/storms.png
@@ -202,7 +212,7 @@ test_lat = -30.5
 test_lon = 90.0
 
 [composite]
-# Creates a composite image of clouds, isobars and wind
+# Creates a composite image of many layers
 enabled = True
 outfile = data/composite_layer.png
 
@@ -211,8 +221,8 @@ outfile = data/composite_layer.png
 # hence disabled until you get an API Key for it.
 enabled = False
 outfile = markers/lightning.txt
-expiry_hours = 1
-runs_per_day = 24
+expiry_hours = 4
+runs_per_day = 12
 
 [quakes]
 enabled = True
@@ -294,7 +304,7 @@ filter_show_ships_by_name = []
 # to make sense of.
 show_tracks = False
 # Minimum distance between track points in km
-track_min_dist = 125.0
+track_min_dist = 5.0
 # Maximum number of tracking positions to show
 track_max_points = 15
 # If a ship has been inactive for this time or more, don't display it
