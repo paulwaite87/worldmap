@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 import os
 import configparser
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
-app = FastAPI(title="WorldMap Configuration API")
+app = FastAPI(title="WorldMap Double Underscore API")
 
-# Setup CORS so your browser running on port 8080 can talk to port 8000
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Fine for local dev tweaking
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,18 +17,9 @@ app.add_middleware(
 CONFIG_PATH = "/opt/project/config/worldmap.conf"
 
 
-# Strictly map out what we expect from the UI input
-class ConfigUpdate(BaseModel):
-    url: str
-    step: float
-    bbox: list[float]
-
-
 def load_raw_config():
-    """Helper to cleanly parse the live configuration file."""
     if not os.path.exists(CONFIG_PATH):
-        raise HTTPException(status_code=404, detail=f"Config file not found at {CONFIG_PATH}")
-
+        raise HTTPException(status_code=404, detail="Configuration layout unavailable.")
     config = configparser.ConfigParser()
     config.read(CONFIG_PATH)
     return config
@@ -38,54 +27,58 @@ def load_raw_config():
 
 @app.get("/api/config")
 def get_config():
-    """Reads worldmap.conf and pulls settings out for the UI."""
     config = load_raw_config()
+    flat_data = {}
 
-    # Safely unpack your configuration sections with smart local fallbacks
-    precipitation_url = config.get("precipitation", "url",
-                                   fallback="https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod")
-    step_size = config.getfloat("precipitation", "step", fallback=0.02)
+    for section in config.sections():
+        for option in config.options(section):
+            key = f"{section}__{option}"
+            value = config.get(section, option)
 
-    # Parse the bounding box array out of its string format
-    bbox_str = config.get("region", "bbox", fallback="156.0,-22.0,164.0,-14.0")
-    try:
-        bbox_list = [float(x.strip()) for x in bbox_str.split(",")]
-    except ValueError:
-        bbox_list = [156.0, -22.0, 164.0, -14.0]
+            # Type casting logic parsing ...
+            if value.lower() in ['true', 'yes', 'on']:
+                flat_data[key] = True
+            elif value.lower() in ['false', 'no', 'off']:
+                flat_data[key] = False
+            else:
+                try:
+                    flat_data[key] = float(value) if '.' in value else int(value)
+                except ValueError:
+                    flat_data[key] = value
 
-    return {
-        "status": "success",
-        "data": {
-            "url": precipitation_url,
-            "step": step_size,
-            "bbox": bbox_list
-        }
-    }
+    # ENFORCEMENT RULE: Check host system for environment variables
+    # If the key is missing or empty, force the UI state to reflect it
+    ais_key = os.getenv("AIS_API_KEY", "").strip()
+    owm_key = os.getenv("OPENWEATHER_API_KEY", "").strip()
+
+    if not ais_key:
+        flat_data["shipping_collector__enabled"] = False
+        flat_data["RULE__missing_ais"] = True
+
+    if not owm_key:
+        flat_data["weather_scanner__enabled"] = False
+        flat_data["RULE__missing_weather"] = True
+
+    return {"status": "success", "data": flat_data}
 
 
 @app.post("/api/config")
-def update_config(payload: ConfigUpdate):
-    """Mutates the live .conf file with user inputs from the UI dashboard."""
+async def update_config(payload: dict):
     config = load_raw_config()
 
-    # Ensure sections exist before updating them
-    if not config.has_section("precipitation"):
-        config.add_section("precipitation")
-    if not config.has_section("region"):
-        config.add_section("region")
+    for flat_key, val in payload.items():
+        # THE FIX: Split strictly at the double underscore
+        if "__" in flat_key:
+            section, option = flat_key.split("__", 1)
+            if not config.has_section(section):
+                config.add_section(section)
 
-    # Inject the fresh values back into the structural blocks
-    config.set("precipitation", "url", payload.url)
-    config.set("precipitation", "step", str(payload.step))
+            if isinstance(val, bool):
+                config.set(section, option, "True" if val else "False")
+            else:
+                config.set(section, option, str(val))
 
-    # Flatten the bounding box float array back into a comma-separated string
-    bbox_string = ",".join(str(val) for val in payload.bbox)
-    config.set("region", "bbox", bbox_string)
+    with open(CONFIG_PATH, "w") as config_file:
+        config.write(config_file)
 
-    # Flush the updates directly back to disk
-    try:
-        with open(CONFIG_PATH, "w") as config_file:
-            config.write(config_file)
-        return {"status": "success", "message": "Configuration updated successfully."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to write configuration to file: {str(e)}")
+    return {"status": "success", "message": "Configuration updated successfully."}
