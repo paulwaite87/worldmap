@@ -10,7 +10,7 @@ from unittest.mock import patch
 sys.path.insert(0, os.path.abspath(str(os.path.join(str(os.path.dirname(__file__)), ".."))))
 
 from worldmap.tasks.isobars import IsobarUpdater
-from tests.common import test_env, check_url_accessibility, verify_generated_image
+from tests.common import test_env, assert_url_accessible, verify_generated_image
 
 
 class MockIsobarUpdater(IsobarUpdater):
@@ -51,9 +51,8 @@ def test_isobar_pipeline(test_env):
     updater = MockIsobarUpdater(test_env["config"], test_env["map_data"])
 
     # 1. Base URL Reachability Assertion
-    base_url = updater.settings.get("url")
-    assert base_url, "Isobar 'url' configuration is missing!"
-    assert check_url_accessibility(base_url.strip(), "NOAA NOMADS GFS Hub Server")
+    base_url = updater.settings.get("url", "").strip('"').rstrip("/")
+    assert_url_accessible(base_url, "NOAA NOMADS GFS Hub Server for Isobars")
 
     # 2. Graphics Generation Engine Execution via Context Injection
     mock_ds = generate_mock_isobar_dataset()

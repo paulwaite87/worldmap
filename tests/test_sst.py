@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 import xarray as xr
 from worldmap.tasks.sst import SSTUpdater
-from tests.common import test_env, check_url_accessibility, verify_generated_image
+from tests.common import test_env, assert_url_accessible, verify_generated_image
 
 
 class MockSSTUpdater(SSTUpdater):
@@ -15,7 +15,7 @@ class MockSSTUpdater(SSTUpdater):
 
         # Override structural modes dynamically at execution runtime
         self.mode = mode_override
-        base_url = self.settings.get("url").strip().rstrip('/')
+        base_url = self.settings.get("url").strip('"').rstrip('/')
         self.target_url = f"{base_url}/sst.day.anom.2026.nc" if self.mode == "anomaly" else f"{base_url}/sst.day.mean.2026.nc"
 
     def generate_mock_netcdf(self):
@@ -63,7 +63,7 @@ def test_sst_pipeline(test_env, sst_mode):
 
     try:
         # 1. URL Accessibility Assertion
-        assert check_url_accessibility(updater.target_url, f"NOAA OISST File ({sst_mode.upper()})")
+        assert_url_accessible(updater.target_url, f"NOAA OISST File for SST ({sst_mode.upper()})")
 
         # 2. Graphics Generation Engine Validation
         updater.generate_mock_netcdf()

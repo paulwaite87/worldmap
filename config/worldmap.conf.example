@@ -41,6 +41,7 @@ log_level = DEBUG
 # https://clouds.matteason.co.uk/
 # Codebase here https://github.com/jmozmoz/cloudmap
 enabled = True
+url = https://clouds.matteason.co.uk/images/4096x2048/clouds.jpg
 outfile = data/cloud_map.jpg
 force = False
 # threshold: 0-255 (e.g., 20 removes dim haze)
@@ -359,4 +360,4 @@ marker_default_colour = cyan
 marker_default_fontsize = 12
 # If you add your own marker files, then list the filenames here, as a
 # comma-separated list and put the files in the 'markers' folder
-marker_files = ["worldmap_markers.txt"]
+marker_files = worldmap_markers.txt

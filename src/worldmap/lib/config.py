@@ -126,7 +126,14 @@ class WorldMapConfig:
 
     def setup_for_tests(self, project_root):
         """Tweak the configuration for testing purposes."""
+        # Sets the working directory to the testing project root
         self.update_setting("common", "workdir", project_root)
+
+        # Clears any user-created marker files from config for testing
+        self.update_setting("xplanet", "marker_files", "")
+
+        # Go through each section enabling it for testing, and also
+        # set the output path to a suitable file for test output
         for section in self.config.sections():
             self.update_setting(section, "enabled", "True")
             current_outfile = self.get_setting(section, "outfile")

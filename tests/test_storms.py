@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from worldmap.tasks.storms import StormUpdater
-from tests.common import test_env, check_url_accessibility, verify_generated_image
+from tests.common import test_env, assert_url_accessible, verify_generated_image
 
 
 class MockStormUpdater(StormUpdater):
@@ -35,15 +35,15 @@ def test_storm_pipeline(test_env):
     nhc_url = updater.settings.get("nhc_url")
 
     assert ibtracs_base, "ibtracs_url is unconfigured!"
-    assert check_url_accessibility(ibtracs_base.strip(), "IBTrACS Hub")
-    assert check_url_accessibility(jtwc_url.strip(), "JTWC Feed") if jtwc_url else True
-    assert check_url_accessibility(nhc_url.strip(), "NHC Feed") if nhc_url else True
+    assert_url_accessible(ibtracs_base.strip(), "IBTrACS Active Storms Hub")
+    assert_url_accessible(jtwc_url.strip(), "JTWC Storm Forecast Feed") if jtwc_url else True
+    assert_url_accessible(nhc_url.strip(), "NHC Storm Forecast Feed") if nhc_url else True
 
     # 2. BeautifulSoup Layout Extraction Validation
     active_csv_url = updater.get_active_csv_url()
     assert active_csv_url, "Could not retrieve active CSV url"
     if active_csv_url != "No ACTIVE storms":
-        assert check_url_accessibility(active_csv_url, "Target Active CSV Data File")
+        assert_url_accessible(active_csv_url, "Target Active CSV Data File")
 
     # 3. Graphics Processing Engine Assertion
     updater.generate_and_render_mock(-18.5, 160.0)

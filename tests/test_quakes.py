@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.abspath(str(os.path.join(str(os.path.dirname(__file__)), ".."))))
 
 from worldmap.tasks.quakes import QuakeUpdater
-from tests.common import test_env, check_url_accessibility
+from tests.common import test_env, assert_url_accessible
 
 
 class MockConfigSection:
@@ -71,9 +71,8 @@ def test_quake_pipeline(test_env):
 
     # 2. Base URL Reachability Assertion
     # Verifies the live USGS feed endpoint is actually online.
-    base_url = updater.settings.get("url")
-    assert base_url, "Quakes 'url' configuration is missing!"
-    assert check_url_accessibility(base_url.strip(), "USGS Earthquake Feed")
+    base_url = updater.settings.get("url", "").strip('"').rstrip("/")
+    assert_url_accessible(base_url, "USGS Earthquake Feed")
 
     # 3. Dependency Injection / Mocking
     # Provide a mock CSV payload with three quakes: Mag 6.2, Mag 4.2 (Should filter), and Mag 5.1

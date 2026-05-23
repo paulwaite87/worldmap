@@ -49,16 +49,28 @@ def check_url_accessibility(url, name):
     except requests.RequestException:
         return False
 
+def assert_url_accessible(url, label):
+    """Assertion helper that provides a clear, human-readable error message."""
+    assert url, f"{label} 'url' configuration is missing!"
 
-def verify_generated_image(file_path, expected_width, expected_height):
+    assert check_url_accessibility(url, label), (
+        f"Connectivity Error: The {label} at {url} is currently unreachable. "
+        "Please verify your internet connection or the status of the remote server."
+    )
+
+def verify_generated_image(file_path, expected_width, expected_height, expected_format="PNG"):
     if not os.path.exists(file_path):
         return False
     try:
+        # verify() checks integrity but doesn't load the raster data
         with Image.open(file_path) as img:
             img.verify()
+
+        # Re-open to check attributes (verify() can sometimes leave the file pointer in an unusable state)
         with Image.open(file_path) as img:
-            return img.format == "PNG" and img.size == (expected_width, expected_height)
-    except Exception:
+            return img.format == expected_format and img.size == (expected_width, expected_height)
+    except Exception as e:
+        logger.error(f"Image verification failed for {file_path}: {e}")
         return False
 
 

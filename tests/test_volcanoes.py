@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, os.path.abspath(str(os.path.join(str(os.path.dirname(__file__)), ".."))))
 
 from worldmap.tasks.volcanoes import VolcanoUpdater
-from tests.common import test_env, check_url_accessibility
+from tests.common import test_env, assert_url_accessible
 
 
 class MockVolcanoUpdater(VolcanoUpdater):
@@ -64,10 +64,8 @@ def test_volcano_pipeline(test_env):
     updater.settings["significant_only"] = "False"
 
     # 1. Base URL Reachability Assertion
-    base_url = updater.settings.get("url")
-    assert base_url, "Volcano 'url' configuration is missing!"
-    # Ensure the NOAA HazEL API base URL is responding
-    assert check_url_accessibility(base_url.strip(), "NOAA HazEL API")
+    base_url = updater.settings.get("url").strip('"').rstrip("/")
+    assert_url_accessible(base_url.strip(), "NOAA HazEL API for Volcano Data")
 
     # 2. Mocking the HTTP request
     # Create a mock response object that mimics urlopen's context manager interface
