@@ -116,14 +116,25 @@ class IsobarUpdater(Updater):
         color = self.settings.get("isobar_color", fallback="white")
         f_size = self.settings.getint("label_fontsize", fallback=10)
 
+        # New Settings: Read thickness and visibility from config
+        thickness = self.settings.getfloat("linewidth", fallback=1.0)
+        alpha_val = self.settings.getfloat("alpha", fallback=1.0)
+
         # High-contrast effects for visibility over dark ocean
-        line_effect = [patheffects.withStroke(linewidth=2.0, foreground="black", alpha=0.4)]
+        # We scale the stroke thickness based on the configured line thickness
+        # and scale the shadow's alpha based on the overall configured alpha
+        line_effect = [patheffects.withStroke(
+            linewidth=thickness + 1.0,
+            foreground="black",
+            alpha=alpha_val * 0.4
+        )]
 
         cs = plot.ax.contour(
             lons, lats, p_smooth,
             levels=levels,
             colors=color,
-            linewidths=1.0,
+            linewidths=thickness,
+            alpha=alpha_val,
             transform=ccrs.PlateCarree()
         )
 
@@ -135,6 +146,7 @@ class IsobarUpdater(Updater):
         labels = plt.clabel(cs, fmt="%d", fontsize=f_size, inline=True, colors=color)
         if labels:
             for txt in labels:
+                txt.set_alpha(alpha_val)
                 txt.set_path_effects(line_effect)
 
         plot.save_figure(self.output_path)

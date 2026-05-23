@@ -88,7 +88,7 @@ class CompositeUpdater(Updater):
                     self.workdir,
                     "data",
                     "regions",
-                    f"{p.stem}_{self.map_data.region.region_identifier}.png"
+                    f"{p.stem}_{self.map_data.region.region_identifier}_{self.target_width}x{self.target_height}.png"
                 ))
 
                 raw_clouds_image = self.get_regional_image(cloud_map_path)

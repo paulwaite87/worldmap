@@ -55,6 +55,8 @@ enabled = True
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/isobars.png
 isobar_color = White
+linewidth = 1.0
+alpha = 1.0
 label_fontsize = 12
 # Optional: isobar text labels outlined for better legibility
 label_outline = False
