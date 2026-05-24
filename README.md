@@ -134,7 +134,7 @@ API keys and enabled them.
     map_builder         | 2026-05-15 15:53:33,566 [INFO] worldmap.map_builder: Map-builder scheduler run finished
 
 The `map_builder` is the main process which puts together all the elements which get displayed 
-on the map. Again, this process is endlessly repeating, so your map will change through the 
+on the map. This process is endlessly repeating, so your map will change through the 
 day as the elements are updated.
 
 ### Regions
@@ -142,7 +142,7 @@ The database will be seeded with a few regions, which can be used to zoom in on 
 you want to populate elements on the map. You can add as many regions as you want. 
 
 To add a region, we will need to get nerdy and insert data into your database. The
-format of an SQL statement which will do just is:
+format of an SQL statement which will do just that is:
 
     INSERT INTO map_region (label, boundary) VALUES ('My Region', ST_MakeEnvelope(-7.346384, 42.490591, 10.854976, 51.487329, 4326));
 
