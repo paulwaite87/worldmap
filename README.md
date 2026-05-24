@@ -17,11 +17,6 @@ with what is essentially a live view of what's happening on the planet.
 
 ## How do I use this?
 
-### Clone the repository:
-
-    cd /your/preferred/workspace
-    git clone -v https://github.com/paulwaite87/WorldMap
-
 ### Prerequisites: Docker Installation
 
 Before running this project, you must have Docker and Docker Compose installed on your system. 
@@ -40,7 +35,49 @@ After installation, run `sudo usermod -aG docker $USER` and log out and back in 
 to take effect. This will allow you to manage containers and orchestration seamlessly while 
 working within the repository.
 
-### Initial Setup
+### Quick Method
+The recommended method of getting this up and running is to use the pre-built
+images and the `worldmap-install.sh` script.
+
+Begin by visiting the repo on Github and downloading that file, or you can grab
+it directly using this link:
+    https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/worldmap-install.sh
+
+(You may have to make sure it is executable with a chmod a+x worldmap-install.sh)
+
+Then just run that:
+
+    ./worldmap-install.sh
+
+By default this will install stuff in your home folder in a sub-folder called `worldmap`.
+
+If you want it to live somewhere else, then use this command instead:
+
+    ./worldmap-install.sh /path/to/worldmap
+
+It will start everything running, but most things will be disabled to begin with. You
+should start by browsing to `http://localhost:8180` and selecting a region and
+maybe just `Clouds` as a start.
+
+There is also a control script for stopping and starting things.
+
+    ./worldmap.sh
+
+With no options, it will print out the commands it understands. The main one for
+updating your desktop would be:
+
+    ./worldmap.sh map-start
+
+And to stop it:
+
+    ./worldmap.sh map-stop
+
+### For the ninjas: Clone the repository:
+
+    cd /your/preferred/workspace
+    git clone -v https://github.com/paulwaite87/worldmap
+
+#### Initial Setup
 Configuration files live in the `config` folder, so get into that folder.
 
 Copy `worldmap.conf.example` to your own local `worldmap.conf`. This is the file you will want
@@ -55,7 +92,7 @@ The same applies to the weather scanner process.
 
 Now that you have your `worldmap.conf` in place, let's get it all up and running.
 
-### Building and running
+#### Building and running
 All main actions you will want to perform with the system from the command line can be
 done via `make`. Have a look in the `Makefile` for the possible targets/actions you can use.
 There are quite a few. To list all possible make targets:

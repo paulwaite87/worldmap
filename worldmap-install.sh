@@ -11,42 +11,62 @@ NC='\033[0m'
 
 echo -e "${BLUE}=== WorldMap Quick Installer ===${NC}"
 
-# 1. Determine installation directory
-# Use the first argument provided, or default to $HOME/worldmap
+# Determine installation directory
 TARGET_DIR="${1:-$HOME/worldmap}"
 INSTALL_DIR=$(realpath "$TARGET_DIR")
-
-echo -e "Setting up World Map in ${GREEN}${INSTALL_DIR}${NC}..."
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
-# 2. Check for prerequisites
+# Check for prerequisites
 if ! command -v docker >/dev/null 2>&1; then
-    echo "Error: Docker is not installed. Please install Docker first."
+    echo "Error: Docker is not installed."
     exit 1
 fi
 
-# 3. Handle .env file
-if [ ! -f .env ]; then
-    echo -e "${YELLOW}Please provide API keys (or ENTER for none is ok)${NC}"
-    read -p "Enter AIS_API_KEY: " ais_key
-    read -p "Enter OPENWEATHER_API_KEY: " weather_key
+# Download and setup configuration
+echo "Downloading configuration templates..."
+mkdir -p config
 
-    echo "AIS_API_KEY=$ais_key" > .env
-    echo "OPENWEATHER_API_KEY=$weather_key" >> .env
-    echo -e "Configuration saved to ${GREEN}${INSTALL_DIR}/.env${NC}"
-else
-    echo -e "Existing ${GREEN}.env${NC} file found, skipping setup."
+# Fetch templates from repository
+curl -fsSL https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/docker-compose-prod.yml -o docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/config/worldmap.conf.example -o config/worldmap.conf
+
+# Fetch and setup .env
+if [ ! -f .env ]; then
+    curl -fsSL https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/.env.tmpl -o .env
+    echo -e "${YELLOW}Template .env created. Please edit it to add your API keys.${NC}"
 fi
 
-# 4. Download the production docker-compose file
-echo "Downloading configuration..."
-curl -fsSL https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/docker-compose-prod.yml -o docker-compose.yml
+# Download the wallpaper daemon scripts
+echo "Setting up wallpaper daemon..."
+curl -fsSL https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/wallpaper_update_daemon.py -o wallpaper_update_daemon.py
+curl -fsSL https://raw.githubusercontent.com/paulwaite87/worldmap/refs/heads/master/wallpaper_update.sh -o wallpaper_update.sh
+chmod +x wallpaper_update.sh
 
-# 5. Start the system
-echo -e "${BLUE}Starting World Map containers...${NC}"
-docker compose -f docker-compose.yml up -d
+# Create the 'worldmap' control script
+echo "Creating control script..."
+cat << 'EOF' > worldmap.sh
+#!/bin/bash
+case "$1" in
+    start) docker compose up -d ;;
+    stop) docker compose down ;;
+    restart) docker compose restart ;;
+    logs) docker compose logs -f ;;
+    status) docker compose ps ;;
+    map-start) nohup ./wallpaper_update.sh > wallpaper.log 2>&1 & echo "Daemon started (logs: wallpaper.log)" ;;
+    map-stop) pkill -f wallpaper_update_daemon.py && echo "Daemon stopped" ;;
+    *) echo "Usage: worldmap {start|stop|restart|logs|status|map-start|map-stop}" ;;esac
+EOF
+chmod +x worldmap.sh
+
+# Start the system
+echo -e "${BLUE}Starting World Map...${NC}"
+./worldmap.sh start
 
 echo -e "${GREEN}=== Installation Complete! ===${NC}"
-echo "World Map is now running in the background."
-echo "You can update your API keys anytime by editing: ${GREEN}${INSTALL_DIR}/.env${NC}"
+echo "System initialized. Please update your settings:"
+echo "API Keys: ${GREEN}$INSTALL_DIR/.env${NC}"
+echo "Configuration: ${GREEN}$INSTALL_DIR/config/worldmap.conf${NC}"
+echo "   Web UI: http://localhost:8180/"
+echo "Use ${GREEN}$INSTALL_DIR/worldmap.sh${NC} to manage the system."
+echo ""

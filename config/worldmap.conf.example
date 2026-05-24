@@ -81,7 +81,7 @@ runs_per_day = 8
 [precipitation]
 # A.k.a "rain radar". Gives a great picture of where the wet
 # stuff is falling and at what rate.
-enabled = True
+enabled = False
 url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
 outfile = data/precipitation.png
 # Minimum rain rate to display (mm/hr)
@@ -181,7 +181,7 @@ key_position = top-left
 runs_per_day = 8
 
 [storms]
-enabled = True
+enabled = False
 # The main storm tracking site; storm name and current and past locations
 ibtracs_url = https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/
 # Two alternatives for storm track forecasting
@@ -211,7 +211,7 @@ expiry_hours = 4
 runs_per_day = 12
 
 [quakes]
-enabled = True
+enabled = False
 url = https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.csv
 outfile = data/quake_markers.txt
 marker_color = White
@@ -260,7 +260,7 @@ erupt_date_codes = D1
 runs_per_day = 1
 
 [shipping]
-enabled = True
+enabled = False
 outfile = data/ship_markers.txt
 marker_color = orange
 label_fontsize = 12
@@ -304,7 +304,7 @@ runs_per_day = 24
 # This collector acquires ship data and stores it in the db, listening to AIS in
 # an endless loop. The harvesting is done globally in 10 longitudinal 'slices'.
 # This stored data is used by the map builder when displaying ships on the map.
-enabled = True
+enabled = False
 # Needs an API Key in your .env file; see https://aisstream.io/documentation
 url = wss://stream.aisstream.io/v0/stream
 # Time to listen for data broadcasts
@@ -321,7 +321,7 @@ log_level = INFO
 
 [weather_scanner]
 # Needs an API Key in your .env file; see https://openweathermap.org
-enabled = True
+enabled = False
 url = https://demo.openweathermap.org/lightning/1.0/data
 expiry_hours = 24
 # Level for logging: DEBUG, INFO, WARNING, ERROR, CRITICAL
