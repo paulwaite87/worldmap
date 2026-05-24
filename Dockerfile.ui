@@ -1,0 +1,3 @@
+FROM nginx:alpine
+# Copy the static UI files into the standard Nginx serving directory
+COPY ./ui /usr/share/nginx/html

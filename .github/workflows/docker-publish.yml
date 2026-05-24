@@ -32,19 +32,29 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          # This tags your image as ghcr.io/paulwaite87/worldmap:latest
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Build and push main image
+      # Build and Push Main Python App
+      - name: Build and push main app image
         uses: docker/build-push-action@v5
         with:
           context: .
-          # Assuming your main Dockerfile is in the root directory
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      # Build and Push UI
+      - name: Build and push UI image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.ui
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-ui:latest
+
+      # Build and Push Database
+      - name: Build and push DB image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.db
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-db:latest
