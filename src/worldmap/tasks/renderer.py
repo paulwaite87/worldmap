@@ -122,6 +122,11 @@ class XPlanetRenderer(Updater):
             if self.config.section_enabled("shipping"):
                 f.write(f'marker_file={self.config.get_section_outfile("shipping")}\n')
 
+            # Base marker files. These are either global (low number of markers)
+            # or regional (high number) to scale density of markers appropriately
+            base_markers = "base_markers_global" if self.world_view else "base_markers_regional"
+            f.write(f"marker_file={base_markers}.txt\n")
+
             # Additional marker files from a list in the config
             marker_files = listify(self.settings.get("marker_files", fallback=''))
             for marker_file in marker_files:
