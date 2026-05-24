@@ -82,12 +82,20 @@ case "$1" in
       echo -e "${GREEN}Containers and images removed. Data and configuration files preserved.${NC}"
       ;;
     purge)
-      echo -e "${YELLOW}WARNING: This will stop all services and delete ALL data (including database and logs).${NC}"
-      read -p "Are you sure you want to purge World Map? [y/N] " confirm
+      echo -e "${YELLOW}WARNING: This will stop all services and delete ALL data (including database, volumes, and images).${NC}"
+      read -p "Are you sure you want to purge WorldMap? [y/N] " confirm
       if [[ $confirm == [yY] ]]; then
+        # Stop and remove containers and volumes
         docker compose down -v
-        rm -rf ./data ./config .env
-        echo -e "${GREEN}Purge complete. All containers, volumes, and local data have been removed.${NC}"
+
+        # Remove the specific images used by the project
+        docker rmi ghcr.io/paulwaite87/worldmap:latest \
+                 ghcr.io/paulwaite87/worldmap-ui:latest \
+                 ghcr.io/paulwaite87/worldmap-db:latest 2>/dev/null || true
+
+        # Use sudo to force cleanup of root-owned volume files
+        sudo rm -rf ./data ./config .env
+        echo -e "${GREEN}Purge complete. All containers, volumes, images, and local data have been removed.${NC}"
       else
         echo "Purge cancelled."
       fi
