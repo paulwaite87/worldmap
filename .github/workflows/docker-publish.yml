@@ -1,7 +1,7 @@
 name: Publish Docker Images to GHCR
 
 # This triggers the workflow whenever you push to the main branch
-# or when you manually trigger it from the GitHub Actions tab.
+# or when you manually trigger it from the GitHub Actions tab
 on:
   push:
     branches: [ "master" ]
