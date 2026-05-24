@@ -1,6 +1,6 @@
-# Ignore local data (volumes handle this at runtime)
+# Ignore local data
 data/
-config/
+config/worldmap.conf
 
 # Ignore Python artifacts
 **/__pycache__/
