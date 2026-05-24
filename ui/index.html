@@ -67,6 +67,10 @@
                                         <option value="8192x4096">8192x4096</option>
                                     </select>
                                 </div>
+                                <div class="col-12">
+                                    <label class="form-label small text-white-50 fw-bold mb-1">Extra markers</label>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" id="xplanet__marker_files" placeholder="e.g. custom_cities.txt, overlays.txt">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -279,6 +283,9 @@
             if(data['common__region'] !== undefined) document.getElementById('common__region').value = data['common__region'];
             if(data['common__desktop_geometry'] !== undefined) document.getElementById('common__desktop_geometry').value = data['common__desktop_geometry'];
             if(data['common__target_geometry'] !== undefined) document.getElementById('common__target_geometry').value = data['common__target_geometry'];
+
+            // Bind the xplanet marker files input field on page load
+            if(data['xplanet__marker_files'] !== undefined) document.getElementById('xplanet__marker_files').value = data['xplanet__marker_files'];
 
             // Bind Master Toggle Switches on 'Show' tab and attach logic updates
             ['clouds', 'isobars', 'wind', 'precipitation', 'lightning', 'storms', 'quakes', 'volcanoes', 'shipping'].forEach(layer => {
@@ -721,24 +728,25 @@
         async function saveActiveConfig() {
             const payload = { ...masterConfigCache };
 
-            // 1. Core Params
+            // Core Params
             payload['common__region'] = document.getElementById('common__region').value;
             payload['common__desktop_geometry'] = document.getElementById('common__desktop_geometry').value;
             payload['common__target_geometry'] = document.getElementById('common__target_geometry').value;
+            payload['xplanet__marker_files'] = document.getElementById('xplanet__marker_files').value;
 
-            // 2. Map Standard Toggles
+            // Map Standard Toggles
             ['clouds', 'isobars', 'wind', 'precipitation', 'lightning', 'storms', 'quakes', 'volcanoes', 'shipping', 'shipping_collector', 'weather_scanner'].forEach(layer => {
                 const el = document.getElementById(`${layer}__enabled`);
                 if (el) payload[`${layer}__enabled`] = el.checked;
             });
 
-            // 3. Map Exclusive Climate Radios
+            // Map Exclusive Climate Radios
             payload['sst__enabled'] = document.getElementById('radio__sst').checked;
             payload['currents__enabled'] = document.getElementById('radio__currents').checked;
             payload['waves__enabled'] = document.getElementById('radio__waves').checked;
             payload['temperature__enabled'] = document.getElementById('radio__temperature').checked;
 
-            // 4. Gather dynamic inputs tuning parameter modifications
+            // Gather dynamic inputs tuning parameter modifications
             const dynamicInputs = document.querySelectorAll("#configForm input, #configForm select");
             dynamicInputs.forEach(input => {
                 const id = input.id;
