@@ -28,6 +28,7 @@
             <li class="nav-item"><button class="nav-link" id="atmospheric-tab" data-bs-toggle="tab" data-bs-target="#atmospheric-pane" type="button">Atmospheric</button></li>
             <li class="nav-item"><button class="nav-link" id="climate-tab" data-bs-toggle="tab" data-bs-target="#climate-pane" type="button">Climate</button></li>
             <li class="nav-item"><button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events-pane" type="button">Events</button></li>
+            <li class="nav-item"><button class="nav-link" id="satellites-tab" data-bs-toggle="tab" data-bs-target="#satellites-pane" type="button">Satellites</button></li>
             <li class="nav-item"><button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping-pane" type="button">Shipping</button></li>
             <li class="nav-item"><button class="nav-link" id="background-tab" data-bs-toggle="tab" data-bs-target="#background-pane" type="button">Background</button></li>
         </ul>
@@ -132,6 +133,13 @@
                         </div>
 
                         <div class="grouping-box">
+                            <h5>Satellites</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="satellites__enabled"><label class="form-check-label fw-bold ms-2">Satellites</label></div></div>
+                            </div>
+                        </div>
+
+                        <div class="grouping-box">
                             <h5>Shipping</h5>
                             <p class="text-muted small mb-3">Show vessels on the map via AIS.:</p>
                             <div class="row g-3">
@@ -173,6 +181,10 @@
                         <div id="container-events"></div>
                     </div>
 
+                    <div class="tab-pane fade" id="satellites-pane">
+                        <div id="container-satellites"></div>
+                    </div>
+
                     <div class="tab-pane fade" id="shipping-pane">
                         <div id="container-shipping"></div>
                     </div>
@@ -200,6 +212,7 @@
             "atmospheric": ["clouds", "isobars", "wind", "precipitation", "lightning", "storms"],
             "climate": ["sst", "currents", "waves", "temperature"],
             "events": ["quakes", "volcanoes"],
+            "satellites": ["satellites"],
             "shipping": ["shipping"],
             "background": ["shipping_collector", "weather_scanner"]
         };
@@ -288,7 +301,7 @@
             if(data['xplanet__marker_files'] !== undefined) document.getElementById('xplanet__marker_files').value = data['xplanet__marker_files'];
 
             // Bind Master Toggle Switches on 'Show' tab and attach logic updates
-            ['clouds', 'isobars', 'wind', 'precipitation', 'lightning', 'storms', 'quakes', 'volcanoes', 'shipping'].forEach(layer => {
+            ['clouds', 'isobars', 'wind', 'precipitation', 'lightning', 'storms', 'quakes', 'volcanoes', 'satellites', 'shipping'].forEach(layer => {
                 const el = document.getElementById(`${layer}__enabled`);
                 if (el && data[`${layer}__enabled`] !== undefined) {
                     el.checked = data[`${layer}__enabled`];
@@ -637,7 +650,7 @@
                                 </select>
                                 <div class="text-white-50" style="font-size: 11px; margin-top: 4px;">💡 Hold Ctrl (or Cmd ⌘) to select multiple. Select none to show all.</div>
                             `;
-                        } else if (item.option === 'errupt_date_codes' || item.option === 'erupt_date_codes') {
+                        } else if (item.option === 'erupt_date_codes') {
                             let activeCodes = [];
                             if (typeof item.value === 'string' && item.value.trim() !== '') {
                                 activeCodes = item.value.split(/\s*,\s*/);
@@ -656,6 +669,33 @@
                                     <option value="U"  ${activeCodes.includes('U')  ? 'selected' : ''}>U  - Undated, prob. Holocene</option>
                                     <option value="Q"  ${activeCodes.includes('Q')  ? 'selected' : ''}>Q  - Quaternary (very old!)</option>
                                     <option value="?"  ${activeCodes.includes('?')  ? 'selected' : ''}>?  - Uncertain Holocene</option>
+                                </select>
+                                <div class="text-white-50" style="font-size: 11px; margin-top: 4px;">💡 Hold Ctrl (or Cmd ⌘) to select multiple timelines.</div>
+                            `;
+                        } else if (item.option === 'sat_names') {
+                            let activeNames = [];
+                            if (typeof item.value === 'string' && item.value.trim() !== '') {
+                                activeNames = item.value.split(/\s*,\s*/);
+                            }
+                            if (item.option === 'sat_names') col.className = 'col-12';
+                            col.innerHTML = `
+                                <label class="form-label small text-white-50 fw-bold mb-1">Satellites to track</label>
+                                <select class="form-select bg-dark text-light border-secondary filter-comma-separated" id="${item.flatKey}" multiple style="height: 220px;">
+                                    <option value="ISS" ${activeNames.includes('ISS') ? 'selected' : ''}>ISS (ZARYA) - International Space Station</option>
+                                    <option value="CSS" ${activeNames.includes('CSS') ? 'selected' : ''}>CSS (TIANGONG)  - Chinese Space Station</option>
+                                    <option value="HST" ${activeNames.includes('HST') ? 'selected' : ''}>HST - Hubble Space Telescope</option>
+                                    <option value="NOAA 15" ${activeNames.includes('NOAA 15') ? 'selected' : ''}>NOAA 15 - Sun-synchronous weather</option>
+                                    <option value="NOAA 15" ${activeNames.includes('NOAA 15') ? 'selected' : ''}>NOAA 18</option>
+                                    <option value="NOAA 19" ${activeNames.includes('NOAA 19') ? 'selected' : ''}>NOAA 19</option>
+                                    <option value="NOAA 20" ${activeNames.includes('NOAA 19') ? 'selected' : ''}>NOAA 20</option>
+                                    <option value="NOAA 21" ${activeNames.includes('NOAA 19') ? 'selected' : ''}>NOAA 21</option>
+                                    <option value="AQUA" ${activeNames.includes('AQUA') ? 'selected' : ''}>AQUA - NASA Earth observation</option>
+                                    <option value="TERRA"  ${activeNames.includes('TERRA') ? 'selected' : ''}>TERRA</option>
+                                    <option value="GOES 16"  ${activeNames.includes('GOES 16') ? 'selected' : ''}>GOES 16 - Geostationary (Americas/Atlantic)</option>
+                                    <option value="GOES 18"  ${activeNames.includes('GOES 18') ? 'selected' : ''}>GOES 18 - Geostationary (Pacific/Americas)</option>
+                                    <option value="METEOSAT-9"  ${activeNames.includes('METEOSAT-9') ? 'selected' : ''}>METEOSAT-9 - Geostationary (Indian Ocean)</option>
+                                    <option value="METEOSAT-10"  ${activeNames.includes('METEOSAT-10') ? 'selected' : ''}>METEOSAT-10 - Geostationary (Europe/Africa)</option>
+                                    <option value="METEOSAT-11"  ${activeNames.includes('METEOSAT-11') ? 'selected' : ''}>METEOSAT-11 - Geostationary (Prime Meridian)</option>
                                 </select>
                                 <div class="text-white-50" style="font-size: 11px; margin-top: 4px;">💡 Hold Ctrl (or Cmd ⌘) to select multiple timelines.</div>
                             `;
@@ -700,6 +740,7 @@
                 "storms": document.getElementById('storms__enabled').checked,
                 "quakes": document.getElementById('quakes__enabled').checked,
                 "volcanoes": document.getElementById('volcanoes__enabled').checked,
+                "satellites": document.getElementById('satellites__enabled').checked,
                 "shipping": document.getElementById('shipping__enabled').checked,
                 "sst": document.getElementById('radio__sst').checked,
                 "currents": document.getElementById('radio__currents').checked,
@@ -735,7 +776,7 @@
             payload['xplanet__marker_files'] = document.getElementById('xplanet__marker_files').value;
 
             // Map Standard Toggles
-            ['clouds', 'isobars', 'wind', 'precipitation', 'lightning', 'storms', 'quakes', 'volcanoes', 'shipping', 'shipping_collector', 'weather_scanner'].forEach(layer => {
+            ['clouds', 'isobars', 'wind', 'precipitation', 'lightning', 'storms', 'quakes', 'volcanoes', 'satellites', 'shipping', 'shipping_collector', 'weather_scanner'].forEach(layer => {
                 const el = document.getElementById(`${layer}__enabled`);
                 if (el) payload[`${layer}__enabled`] = el.checked;
             });

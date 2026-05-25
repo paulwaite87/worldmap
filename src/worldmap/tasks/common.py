@@ -295,6 +295,9 @@ class Updater:
                 return output_path
         return None
 
+    def get_base_url(self):
+        return self.settings.get("url", "").rstrip('/')
+
     def remove_output_file(self):
         """Clears the output file of this updater if it exists"""
         output_path = self.get_output_path()

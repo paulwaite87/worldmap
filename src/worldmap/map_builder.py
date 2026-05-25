@@ -27,6 +27,7 @@ from worldmap.tasks.composite import CompositeUpdater
 from worldmap.tasks.storms import StormUpdater
 from worldmap.tasks.lightning import LightningUpdater
 from worldmap.tasks.quakes import QuakeUpdater
+from worldmap.tasks.satellites import SatelliteUpdater
 from worldmap.tasks.shipping import ShippingUpdater
 from worldmap.tasks.volcanoes import VolcanoUpdater
 from worldmap.tasks.renderer import XPlanetRenderer
@@ -70,6 +71,7 @@ class MapBuilder:
             ("composite", CompositeUpdater),
             ("lightning", LightningUpdater),
             ("quakes", QuakeUpdater),
+            ("satellites", SatelliteUpdater),
             ("shipping", ShippingUpdater),
             ("volcanoes", VolcanoUpdater),
             ("xplanet", XPlanetRenderer),  # always keep renderer last
