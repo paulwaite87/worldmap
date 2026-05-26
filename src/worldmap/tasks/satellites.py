@@ -28,6 +28,8 @@ class SatelliteUpdater(Updater):
 
         base_url = self.get_base_url()
         target_names = listify(self.settings.get("sat_names", fallback=""))
+        marker_color = self.settings.get("marker_color", fallback="White")
+        marker_fontsize = self.settings.getint("marker_fontsize", fallback=10)
         trail_minutes = self.settings.getint("trail_minutes", fallback=5)
         degrees_above_horizon = self.settings.getint("degrees_above_horizon", fallback=45)
 
@@ -138,7 +140,7 @@ class SatelliteUpdater(Updater):
                             display_name = name_line
 
                         # --- 1. Write visual styling to the marker file ---
-                        f_marker.write(f'{sat_id} "{display_name}" color=White\n')
+                        f_marker.write(f'{sat_id} "{display_name}" color={marker_color} fontsize={marker_fontsize}\n')
                         f_marker.write(f'{sat_id} "" image=none altcirc={degrees_above_horizon} trail={{orbit,-{trail_minutes},0,1}} color=Yellow\n')
                         f_marker.write(f'{sat_id} "" image=none trail={{orbit,{trail_minutes},0,1}} color=Red\n')
 

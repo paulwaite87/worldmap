@@ -262,7 +262,10 @@ runs_per_day = 1
 [satellites]
 enabled = False
 url = https://celestrak.org/NORAD/elements
-# Picked from a fixed list of 15 popular orbiting objects
+# Color of the satellite marker and name
+marker_color = White
+marker_fontsize = 10
+# Picked from a fixed list of popular orbiting objects
 # (see the web-based configurator)
 sat_names = ISS (ZARYA), CSS (TIANHE)
 # Update frequency can be high to track fast-moving satellites
