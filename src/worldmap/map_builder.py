@@ -27,6 +27,7 @@ from worldmap.tasks.composite import CompositeUpdater
 from worldmap.tasks.storms import StormUpdater
 from worldmap.tasks.lightning import LightningUpdater
 from worldmap.tasks.quakes import QuakeUpdater
+from worldmap.tasks.satellites import SatelliteUpdater
 from worldmap.tasks.shipping import ShippingUpdater
 from worldmap.tasks.volcanoes import VolcanoUpdater
 from worldmap.tasks.renderer import XPlanetRenderer
@@ -70,6 +71,7 @@ class MapBuilder:
             ("composite", CompositeUpdater),
             ("lightning", LightningUpdater),
             ("quakes", QuakeUpdater),
+            ("satellites", SatelliteUpdater),
             ("shipping", ShippingUpdater),
             ("volcanoes", VolcanoUpdater),
             ("xplanet", XPlanetRenderer),  # always keep renderer last
@@ -79,7 +81,7 @@ class MapBuilder:
         self.config.load()
         self.enabled = self.config.get_setting("map_builder", "enabled")
         # Adjust log level if changed
-        log_level = self.config.get_setting("map_builder", "log_level")
+        log_level = self.config.get_setting("common", "log_level")
         if log_level:
             set_loglevel(log_level)
 
@@ -122,11 +124,11 @@ class MapBuilder:
         if updater.section == "xplanet" and self.map_updated:
             return True
 
-        try:
-            runs_per_day: int = updater.settings.getint("runs_per_day", fallback=0)
-        except ValueError:
-            logger.error(f"Invalid 'runs_per_day' in section [{updater.section}]. Expected integer.")
-            return False
+        if updater.section == "satellites":
+            update_minutes = updater.settings.getint("update_minutes", fallback=10)
+            runs_per_day = int((24 * 60) / update_minutes)
+        else:
+            runs_per_day = int(updater.settings.get("runs_per_day", fallback=0))
 
         if runs_per_day <= 0:
             return False

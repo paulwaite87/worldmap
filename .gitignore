@@ -1,6 +1,7 @@
 # --- Project Specific (Data & Config) ---
-# Ignore all files in data/
+# Ignore various data files
 data/*
+satellites/*
 /config/worldmap.conf
 
 # Ignore environment secrets
@@ -18,6 +19,7 @@ __pycache__/
 .ipynb_checkpoints/
 .pytest_cache/
 .mypy_cache/
+nohup.out
 
 # --- Build & Packaging ---
 dist/
