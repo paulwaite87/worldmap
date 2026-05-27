@@ -5,6 +5,7 @@ import sys
 import logging
 import requests
 import pandas as pd
+from datetime import datetime, timezone
 
 # Internal library import
 from worldmap.lib.config import WorldMapConfig
@@ -24,9 +25,12 @@ class QuakeUpdater(Updater):
 
         url = self.get_base_url()
         marker_color = self.settings.get("marker_color", fallback="white")
-        marker_symbol = self.settings.get("marker_symbol")
+        marker_symbol_new = self.settings.get("marker_symbol_new")
+        marker_symbol_old = self.settings.get("marker_symbol_old")
         label_size = self.settings.get("label_fontsize", fallback="12")
         min_mag = self.settings.getfloat("min_mag", fallback=5.0)
+        recent_activity_hours = self.settings.getint("recent_activity_hours", fallback=3)
+        expiry_hours = self.settings.getint("expiry_hours", fallback=24)
 
         try:
             logger.debug(f"Fetching earthquake data from USGS (Min Mag: {min_mag})...")
@@ -36,13 +40,31 @@ class QuakeUpdater(Updater):
             # Load CSV data into Pandas
             df = pd.read_csv(io.StringIO(r.text))
 
+            # --- NEW: Parse the time column into timezone-aware datetimes ---
+            df["time"] = pd.to_datetime(df["time"])
+
             # Filter by magnitude
             filtered_df = df[df["mag"] >= min_mag]
+
+            # Establish 'now' in UTC to compare against the USGS 'Z' (Zulu/UTC) timestamps
+            now_utc = datetime.now(timezone.utc)
 
             with open(self.output_path, "w") as f:
                 for _, row in filtered_df.iterrows():
                     mag = row["mag"]
                     depth = int(row["depth"])
+                    quake_time = row["time"]
+
+                    # --- NEW: Calculate age and assign the correct symbol ---
+                    age_hours = int((now_utc - quake_time).total_seconds() / 3600.0)
+
+                    if age_hours >= expiry_hours:
+                        continue
+                    elif age_hours < recent_activity_hours:
+                        marker_symbol = marker_symbol_new
+                    else:
+                        marker_symbol = marker_symbol_old
+
                     # Format: lat lon "label" color=X fontsize=Y image=Z
                     line = (
                         f"{row['latitude']} {row['longitude']} "
