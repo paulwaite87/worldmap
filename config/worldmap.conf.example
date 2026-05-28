@@ -58,9 +58,9 @@ outfile = data/cloud_map.jpg
 threshold = 150
 # gamma: 0.1 - 2.0 (e.g., 0.5 makes clouds much more transparent)
 gamma = 0.4
-runs_per_day = 12
 # Any clouds image older then this will be refreshed
 expiry_hours = 3
+runs_per_day = 12
 
 [isobars]
 # An excellent overall picture of what the air pressure map is in
@@ -90,7 +90,7 @@ barb_length_step = 0.8
 # A density factor. Number of barbs across the region image
 # If you want more wind info (more barbs), increase this
 barb_density = 30.0
-runs_per_day = 8
+runs_per_day = 12
 
 [precipitation]
 # A.k.a "rain radar". Gives a great picture of where the wet
@@ -107,7 +107,7 @@ palette = standard
 key_fontsize = 18
 # Options: top-left, top-right, bottom-left, bottom-right
 key_position = top-left
-runs_per_day = 8
+runs_per_day = 12
 
 [sst]
 # Sea Surface Temperatures. An interesting layer but best used
@@ -190,7 +190,22 @@ show_freezing_line = True
 key_fontsize = 18
 # Options: top-left, top-right, bottom-left, bottom-right
 key_position = top-left
-runs_per_day = 8
+runs_per_day = 2
+
+[ozone]
+enabled = False
+url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
+outfile = data/ozone.png
+# Possible values: critical, plasma, viridis, inferno, turbo
+palette = critical
+# A critical level in Dobson Units below which we have
+# serious issues - the so-called Ozone Hole
+critical_du = 220.0
+alpha = 1.0
+key_fontsize = 18
+# Options: top-left, top-right, bottom-left, bottom-right
+key_position = bottom-left
+runs_per_day = 2
 
 [storms]
 enabled = False
@@ -207,7 +222,7 @@ forecast_cone_alpha = 0.5
 forecast_cone_color = White
 storm_track_color = DeepPink
 expiry_days=4
-runs_per_day = 8
+runs_per_day = 12
 
 [composite]
 # Creates a composite image of many layers
@@ -227,10 +242,15 @@ enabled = False
 url = https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.csv
 outfile = data/quake_markers.txt
 marker_color = White
-marker_symbol = earthquake_symbol.png
+marker_symbol_new = earthquake_symbol_new.png
+marker_symbol_old = earthquake_symbol_old.png
+# Hours up until which the earthquake is classes as 'new'
+recent_activity_hours = 3
+# Hours after which an earthquake will not be displayed
+expiry_hours = 24
 label_fontsize = 14
 min_mag = 5.0
-runs_per_day = 8
+runs_per_day = 24
 
 [volcanoes]
 enabled = False

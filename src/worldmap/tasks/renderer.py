@@ -97,7 +97,10 @@ class XPlanetRenderer(Updater):
             f.write('"Earth"\n')
             f.write(f'color={self.fix_color(self.fill_default_color)}\n')
             f.write(f"map={day_map}\n")
-            f.write(f"night_map={night_map}\n")
+            if self.climate_layer_is_active():
+                f.write("shade=100\n")
+            else:
+                f.write(f"night_map={night_map}\n")
             # Xplanet mapbounds={NorthWest_Lat, NorthWest_Lon, SouthEast_Lat, SouthEast_Lon}
             # bbox order from maps.py: [lon_min, lat_min, lon_max, lat_max]
             # Therefore: {lat_max, lon_min, lat_min, lon_max}
@@ -125,7 +128,7 @@ class XPlanetRenderer(Updater):
             # Show satellites - these are always in the 'satellites' folder
             # and the filename is always 'sat_file'.
             if self.config.section_enabled("satellites"):
-                f.write(f'satellite_file=sat_file\n')
+                f.write('satellite_file=sat_file\n')
 
             # Show shipping activity
             if self.config.section_enabled("shipping"):

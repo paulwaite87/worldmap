@@ -60,7 +60,7 @@ class PrecipitationUpdater(Updater):
 
     def check_remote_freshness(self):
         """Checks for a shared baseline first, otherwise falls back to current time logic."""
-        base_url = self.settings.get("url").rstrip('/')
+        base_url = self.get_base_url()
 
         # --- Check for baseline set by Isobars ---
         baseline = getattr(self.map_data, 'shared_state', {}).get('gfs_baseline')
@@ -182,6 +182,9 @@ class PrecipitationUpdater(Updater):
         )
 
         prate = ds_clipped["prate"].values.squeeze() * 3600.0
+        # Apply the minimum threshold to clip out trace noise
+        prate[prate < min_rate] = 0.0
+
         lons = ds_clipped.longitude.values
         lats = ds_clipped.latitude.values
 
@@ -190,8 +193,20 @@ class PrecipitationUpdater(Updater):
         del ds
         gc.collect()
 
-        # 2. Interpolation on the clipped subset only
-        step = 0.02
+        # 2. DYNAMIC RESAMPLING: Scale step size based on bounding box area to prevent OOM
+        lon_span = abs(lon_max - lon_min)
+        lat_span = abs(lat_max - lat_min)
+
+        # If the region spans more than 90 deg longitude or 45 deg latitude (~0.25 of world area)
+        if lon_span > 90.0 or lat_span > 45.0:
+            logger.info(
+                f"Large region detected ({lon_span:.1f}°x{lat_span:.1f}°). Using resource-friendly global grid settings.")
+            step = 0.15  # Drops a global mesh grid size from 162M points down to ~2.8M points
+            filter_sigma = 0.8  # Adjusted for the coarser grid spacing
+        else:
+            step = 0.02  # Maintain your ultra-high resolution for regional mapping
+            filter_sigma = 1.2
+
         new_lats = np.arange(lats.min(), lats.max() + step, step)
         new_lons = np.arange(lons.min(), lons.max() + step, step)
 
@@ -223,7 +238,7 @@ class PrecipitationUpdater(Updater):
         norm = mcolors.BoundaryNorm(levels, cmap.N)
 
         # 4. Render Heatmap Contour
-        prate_smooth = gaussian_filter(prate_smooth, sigma=1.2)
+        prate_smooth = gaussian_filter(prate_smooth, sigma=filter_sigma)
         cf = plot.ax.contourf(
             new_lons, new_lats, prate_smooth,
             levels=levels,
@@ -269,7 +284,7 @@ class PrecipitationUpdater(Updater):
         if callable(plt_close):
             plt_close()
 
-        logger.debug(f"Finished Precipitation plot. Memory cleared.")
+        logger.debug("Finished Precipitation plot. Memory cleared.")
 
     def run(self):
         self.exit_if_disabled()

@@ -277,24 +277,93 @@ for some reason you want to refresh the regional maps then `sudo rm data/regions
 #### Volcanoes
 Volcanoes are pretty much static day-to-day and can end up just cluttering up the map, 
 so I generally don't display them. There are also a lot of them, depending on which
-options you set in the configuration. One useful option for these is the option
-`Specific volcano by name` if a particular volcano on the planet has a big eruption
-and you want to display it. That field can take a comma-separated list too, if you
-have several you want to display.
+options you set in the configuration. Each volcano will appear on the map
+as this symbol ![Volcano](images/volcano_symbol.png)
+
+One useful option for these is the option `Specific volcano by name` if a particular
+volcano on the planet has a big eruption and you want to display it. That field can
+take a comma-separated list too, if you have several you want to display.
+
+#### Earthquakes
+These are one of the most interesting elements to put onto the map because it allows 
+you to visualise clusters of quakes appearing and providing a pattern of activity. 
+The symbol used comes in two colours, one for a very recent earthquake and one for 
+those older. You can set the `Recent activity hours` which determines this switch in
+the configuration UI. The expiry hours can also be set there. Symbols:
+* ![EQ recent](images/earthquake_new.png) Recent earthquake activity
+* ![EQ older](images/earthquake_old.png) Older earthquakes
 
 #### Storms
 Storms will drop off the map when the `Expiry days` is exceeded. Quite often the NOAA
 site will simply stop updating a storm if it loses strength and becomes a tropical low
 or similar. This expiry stops it hanging around too long once the updates stop.
 
+A storm is depicted as a track history then a symbol ![Storm](images/storm_symbol.png)
+followed by a prediction cone showing where the storm might go next.
+
+#### Climate
+This area is quite fascinating as it covers the entire planet. The data is sourced
+from https://nomads.ncep.noaa.gov/ which contains a staggering amount of publicly
+available data. Currently we are just dipping our toes in those waters and providing
+Sea Surface Temperature, Air/land Temperature, Wave Heights, Ocean Currents and
+the Ozone Layer data resolved to a 0.25 degree grid (with interpolation/smoothing
+as required).
+
+Each of those layers is mutually exclusive due to the fact they provide a colourisation
+of the entire planet. If you had more than one you might end up with a useless mashup
+of overlapping colours on screen. In fact use of these layers is best done with just
+about every other layer disabled. That would include Clouds, Isobars and Precipitation,
+though for marker elements such as Earthquakes, Shipping etc it isn't so important.
+
+##### SST
+For Sea Surface Temperature we have two options: Absolute and Anomaly. Absolute give you
+a straightforward temperature reading map. Anomaly is the temperature deviation from
+those expected from historical data. That is, differences from what would be normal
+at that location, day of the year and time of day. It's a fascinating visualisation
+of the warming of our planet.
+
+##### Air Temperature
+Air/land temperatures are a measure of what's going on in our atmosphere. Absolute is
+once again straightforward, but this time the `Anomaly` setting is not a comparison
+with historical data. It is a comparison with the average temperature of the region
+being viewed right now. So it shows the hot and cool spots in the region.
+
+##### Waves
+This one is a colourisation depicting wave height across the planet. It gets quite
+interesting when you watch waves interacting with a storm, or a tsunami eventuates
+from an earthquake.
+
+##### Ocean Currents
+These are depicted as curves with arrows showing the flows going on in our oceans
+on a real-time basis. This is one layer which could be shown together with others
+such as Isobars, Clouds and Precipitation as it isn't a colouration layer.
+
+##### Ozone Layer
+Another interesting climate layer to have a look at. There are a few palettes to
+choose from but I think the most useful one is `critical` which ties in with a
+setting you can configure called `Critical du`. The `du` stands for "Dobson Units"
+which is what the ozone layer density is measured in. A value of `220.0` is
+considered the threshold for a "hole" in the ozone layer. If you choose the
+`critical` palette any ozone levels above that setting will be rendered
+transparent, and anything below is given a color, so you only see the problem
+areas.
+
 #### Shipping
-If you select `Disc` ship icons there are basically two variants: Cargo (has a 'C' in
-the middle) and Tankers ('T' in the middle). They each have their own default colors,
-but these can also vary if the system detects their draught (loading) has decreased.
+If you select `Disc` ship icons there are basically two variants, Cargo and Tanker but
+with different colours depending on loading state. This setting is really only useful
+when you have things set up such that there is a low density of ships otherwise they
+can overlap too much:
+* ![Cargo](images/ship_cargo.png) Cargo
+* ![Cargo unloaded](images/ship_cargo_empty.png) Cargo (unloaded)
+* ![Tanker](images/ship_tanker.png) Tanker
+* ![Tanker unloaded](images/ship_tanker_empty.png) Tanker (unloaded)
 
 If you select `Arrows` for the ship icons then there is a color code: red for tankers,
 green for cargo, violet for passenger/other. Also the arrows will point in the direction
-that the vessel is heading currently.
+that the vessel is heading currently. Examples:
+* ![Tankers](images/red_ship_base.png) Tankers
+* ![Cargo](images/green_ship_base.png) Cargo
+* ![Passenger](images/purple_ship_base.png) Passenger/other
 
 Tip: If you have `filter_ships_underway` set to True, shipping with speeds less than 
 1.0 knots, or flagged as anchored or moored are NOT displayed. This avoids masses of ship

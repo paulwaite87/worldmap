@@ -31,7 +31,7 @@ class IsobarUpdater(Updater):
 
     def check_remote_freshness(self):
         """Finds the most recent GFS run, sets it as the baseline, and checks local cache."""
-        base_url = self.settings.get("url").rstrip('/')
+        base_url = self.get_base_url()
         now = datetime.now(timezone.utc)
 
         for day_offset in range(3):
@@ -168,7 +168,7 @@ class IsobarUpdater(Updater):
         try:
             url, needs_download = self.check_remote_freshness()
             if needs_download:
-                logger.info(f"Downloading fresh isobar data...")
+                logger.info("Downloading fresh isobar data...")
                 self.download_data(url)
 
             if needs_download or not os.path.exists(self.output_path) or self.config.has_changed:
