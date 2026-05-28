@@ -23,6 +23,7 @@ from worldmap.tasks.sst import SSTUpdater
 from worldmap.tasks.currents import CurrentsUpdater
 from worldmap.tasks.waves import WavesUpdater
 from worldmap.tasks.temperature import TemperatureUpdater
+from worldmap.tasks.ozone import OzoneUpdater
 from worldmap.tasks.composite import CompositeUpdater
 from worldmap.tasks.storms import StormUpdater
 from worldmap.tasks.lightning import LightningUpdater
@@ -62,6 +63,7 @@ class MapBuilder:
             ("currents", CurrentsUpdater),
             ("waves", WavesUpdater),
             ("temperature", TemperatureUpdater),
+            ("ozone", OzoneUpdater),
             ("storms", StormUpdater),
             ("composite", CompositeUpdater),
             ("lightning", LightningUpdater),

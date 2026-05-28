@@ -301,6 +301,42 @@ or similar. This expiry stops it hanging around too long once the updates stop.
 A storm is depicted as a track history then a symbol ![Storm](images/storm_symbol.png)
 followed by a prediction cone showing where the storm might go next.
 
+#### Climate
+This area is quite fascinating as it covers the entire planet. The data is sourced
+from https://nomads.ncep.noaa.gov/ which contains a staggering amount of publicly
+available data. Currently we are just dipping our toes in those waters and providing
+Sea Surface Temperature, Air/land Temperature, Wave Heights, and Ocean Currents
+data resolved to a 0.25 degree grid (with interpolation/smoothing as required).
+
+Each of those layers is mutually exclusive due to the fact they provide a colourisation
+of the entire planet. If you had more than one you would end up with a useless mashup
+of meaningless colours on screen. In fact use of these layers is best done with just
+about every other layer disabled. That would include Clouds, Isobars and Preciptiation,
+though for marker elements such as Earthquakes, Shipping etc it isn't so important.
+
+##### SST
+For Sea Surface Temperature we have two options: Absolute and Anomaly. Absolute give you
+a straightforward temperature reading map. Anomaly is the temperature deviation from
+those expected from historical data. That is, differences from what would be normal
+at that location, day of the year and time of day. It's a fascinating visualisation
+of the warming of our planet.
+
+##### Air Temperature
+Air/land temperatures are a measure of what's going on in our atmosphere. Absolute is
+once again straightforward, but this time the `Anomaly` setting is not a comparison
+with historical data. It is a comparison with the average temperature of the region
+being viewed right now. So it shows the hot and cool spots in the region.
+
+##### Waves
+This one is a colourisation depicting wave height across the planet. It gets quite
+interesting when you watch waves interacting with a storm, or a tsunami eventuates
+from and earthquake.
+
+##### Ocean Currents
+These are depicted as curves with arrows showing the flows going on in our oceans
+on a real-time basis. This is one layer which could be shown together with others
+such as Isobars, Clouds and Precipitation as it isn't a colouration layer.
+
 #### Shipping
 If you select `Disc` ship icons there are basically two variants, Cargo and Tanker but
 with different colours depending on loading state. This setting is really only useful

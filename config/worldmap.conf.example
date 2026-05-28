@@ -192,6 +192,21 @@ key_fontsize = 18
 key_position = top-left
 runs_per_day = 2
 
+[ozone]
+enabled = False
+url = https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod
+outfile = data/ozone.png
+# Possible values: critical, plasma, viridis, inferno, turbo
+palette = critical
+# A critical level in Dobson Units below which we have
+# serious issues - the so-called Ozone Hole
+critical_du = 220.0
+alpha = 1.0
+key_fontsize = 18
+# Options: top-left, top-right, bottom-left, bottom-right
+key_position = bottom-left
+runs_per_day = 2
+
 [storms]
 enabled = False
 # The main storm tracking site; storm name and current and past locations

@@ -21,15 +21,24 @@ logger = logging.getLogger(__name__)
 # These are sections which contribute to the composite layer
 # image used in XPlanet rendering via the 'cloud"map' option
 COMPOSITE_SECTIONS = [
+    "isobars",
+    "precipitation",
+    "clouds",
+    "wind",
     "sst",
-    "temperature",
     "currents",
     "waves",
-    "clouds",
-    "precipitation",
-    "isobars",
-    "wind",
+    "temperature",
+    "ozone",
     "storms"
+]
+# A subset of the above list which pertain to climate layers.
+# These are layers which colourise the whole active region.
+CLIMATE_LAYERS = [
+    "sst",
+    "waves",
+    "temperature",
+    "ozone"
 ]
 
 def listify(text: str) -> list:
@@ -379,6 +388,13 @@ class Updater:
             logger.error(f"Failed to crop to regional image: {e}")
 
         return None
+
+    def climate_layer_is_active(self):
+        """Return True if at least one climate layer is enabled"""
+        for layer in CLIMATE_LAYERS:
+            if self.config.section_enabled(layer):
+                return True
+        return False
 
     def create_plot(self):
         plot_target_width = float(self.target_width) / 100

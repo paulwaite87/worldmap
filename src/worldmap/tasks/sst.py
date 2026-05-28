@@ -22,15 +22,15 @@ class SSTUpdater(Updater):
         super().__init__(config, "sst", map_data)
         self.set_output_path()
 
-        # 1. Parse operational mode
+        # Parse operational mode
         self.mode = self.settings.get("mode", fallback="absolute").strip().lower()
 
-        # 2. Extract base URL from config file with a clean trailing slash strip
+        # Extract base URL from config file with a clean trailing slash strip
         base_url = self.settings.get("url",
                                      fallback="https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres").strip().rstrip(
             '/')
 
-        # 3. Construct paths and target endpoints using the common base_url
+        # Construct paths and target endpoints using the common base_url
         if self.mode == "anomaly":
             self.nc_path = os.path.join(self.workdir, "data/noaa_oisst_anomaly.nc")
             self.target_url = f"{base_url}/sst.day.anom.2026.nc"

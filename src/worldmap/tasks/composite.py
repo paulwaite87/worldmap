@@ -24,35 +24,13 @@ class CompositeUpdater(Updater):
         super().__init__(config, "Composite", map_data)
         self.set_output_path()
 
-        # Config sections
-        self.clouds_settings = self.config.get_section("clouds")
-        self.sst_settings = self.config.get_section("sst")
-        self.precip_settings = self.config.get_section("precipitation")
-        self.isobar_settings = self.config.get_section("isobars")
-        self.wind_settings = self.config.get_section("wind")
-        self.currents_settings = self.config.get_section("currents")
-        self.waves_settings = self.config.get_section("waves")
-        self.temperature_settings = self.config.get_section("temperature")
-
-        # Enabled flags
-        self.sst_enabled = self.config.section_enabled("sst")
-        self.clouds_enabled = self.clouds_settings.getboolean("enabled", fallback=False)
-        self.precip_enabled = self.config.section_enabled("precipitation")
-        self.isobars_enabled = self.config.section_enabled("isobars")
-        self.wind_enabled = self.config.section_enabled("wind")
-        self.currents_enabled = self.config.section_enabled("currents")
-        self.waves_enabled = self.config.section_enabled("waves")
-        self.temperature_enabled = self.config.section_enabled("temperature")
-        self.storms_enabled = self.config.section_enabled("storms")
-
     def _apply_cloud_transparency(self, cloud_img: Image.Image) -> Image.Image:
         """
         Applies threshold and gamma corrections to the cloud mask
         to prevent 'white-out' and control wispy-ness.
         """
-        threshold = self.clouds_settings.getint("threshold", fallback=0)
-        gamma = self.clouds_settings.getfloat("gamma", fallback=1.0)
-
+        threshold = int(self.config.get_setting("clouds", "threshold", 0))
+        gamma = float(self.config.get_setting("clouds", "gamma", 1.0))
         cloud_mask = cloud_img.convert("L")
 
         lut = [
@@ -89,7 +67,7 @@ class CompositeUpdater(Updater):
             ))
 
             # Prepare the cloud base if enabled and the cached region file exists
-            if self.clouds_enabled and os.path.exists(cloud_map_path):
+            if self.config.section_enabled("clouds") and os.path.exists(cloud_map_path):
                 # We skip self.get_regional_image() because the file is already regional
                 with Image.open(cloud_map_path) as raw_clouds_image:
                     transparent_clouds = self._apply_cloud_transparency(raw_clouds_image)

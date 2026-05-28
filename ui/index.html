@@ -88,6 +88,12 @@
                                         <label class="form-check-label fw-bold ms-1" for="radio__temperature">Air Temperature</label>
                                     </div>
                                 </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exclusive_climate" id="radio__ozone">
+                                        <label class="form-check-label fw-bold ms-1" for="radio__ozone">Ozone</label>
+                                    </div>
+                                </div>
                                 <div class="col-12 mt-2">
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearClimateRadio()">None / Disable Climate Base Layer</button>
                                 </div>
@@ -181,7 +187,7 @@
         const TAB_GROUPS = {
             "global": ["common"],
             "atmospheric": ["clouds", "isobars", "wind", "precipitation", "lightning", "storms"],
-            "climate": ["sst", "currents", "waves", "temperature"],
+            "climate": ["sst", "currents", "waves", "temperature", "ozone"],
             "events": ["quakes", "volcanoes"],
             "satellites": ["satellites"],
             "shipping": ["shipping"],
@@ -570,6 +576,16 @@
                                 <input type="range" class="form-range" id="${item.flatKey}" min="0.0" max="10.0" step="0.1" value="${initialAlpha}"
                                        oninput="document.getElementById('badge-${item.flatKey}').innerText = parseFloat(this.value).toFixed(1)">
                             `;
+                        } else if (item.option.includes('critical_du')) {
+                            const initialAlpha = parseFloat(item.value) !== undefined ? parseFloat(item.value) : 1.0;
+                            col.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label small text-white-50 fw-bold mb-0">${customLabelText}</label>
+                                    <span class="badge bg-warning text-dark fw-bold" id="badge-${item.flatKey}">${initialAlpha.toFixed(1)}</span>
+                                </div>
+                                <input type="range" class="form-range" id="${item.flatKey}" min="150.0" max="450.0" step="10.0" value="${initialAlpha}"
+                                       oninput="document.getElementById('badge-${item.flatKey}').innerText = parseFloat(this.value).toFixed(1)">
+                            `;
                         } else if (item.option.includes('runs_per_day')) {
                             const initialVal = parseInt(item.value) || 4;
                             col.innerHTML = `
@@ -651,6 +667,14 @@
                                     <option value="standard" ${item.value === 'standard' ? 'selected' : ''}>standard</option>
                                     <option value="ocean_blue" ${item.value === 'ocean_blue' ? 'selected' : ''}>ocean_blue</option>
                                     <option value="high_contrast" ${item.value === 'high_contrast' ? 'selected' : ''}>high_contrast</option>
+                                `;
+                            } else if (section === 'ozone') {
+                                optionsHTML = `
+                                    <option value="critical" ${item.value === 'critical' ? 'selected' : ''}>critical</option>
+                                    <option value="plasma" ${item.value === 'plasma' ? 'selected' : ''}>plasma</option>
+                                    <option value="viridis" ${item.value === 'viridis' ? 'selected' : ''}>viridis</option>
+                                    <option value="inferno" ${item.value === 'inferno' ? 'selected' : ''}>inferno</option>
+                                    <option value="turbo" ${item.value === 'turbo' ? 'selected' : ''}>turbo</option>
                                 `;
                             } else {
                                 optionsHTML = null;
@@ -797,6 +821,7 @@
                 "currents": document.getElementById('radio__currents')?.checked,
                 "waves": document.getElementById('radio__waves')?.checked,
                 "temperature": document.getElementById('radio__temperature')?.checked,
+                "ozone": document.getElementById('radio__ozone')?.checked,
                 "shipping_collector": document.getElementById('shipping_collector__enabled')?.checked,
                 "weather_scanner": document.getElementById('weather_scanner__enabled')?.checked
             };
@@ -831,6 +856,7 @@
             payload['currents__enabled'] = document.getElementById('radio__currents').checked;
             payload['waves__enabled'] = document.getElementById('radio__waves').checked;
             payload['temperature__enabled'] = document.getElementById('radio__temperature').checked;
+            payload['ozone__enabled'] = document.getElementById('radio__ozone').checked;
 
             // Gather dynamic inputs
             const dynamicInputs = document.querySelectorAll("#configForm input, #configForm select");
