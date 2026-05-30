@@ -330,8 +330,8 @@ Storms will drop off the map when the `Expiry days` is exceeded. Quite often the
 site will simply stop updating a storm if it loses strength and becomes a tropical low
 or similar. This expiry stops it hanging around too long once the updates stop.
 
-A storm is depicted as a track history then a symbol ![Storm](images/storm_symbol.png)
-followed by a prediction cone showing where the storm might go next.
+A storm is depicted as a track history followed by a prediction cone showing where
+the storm might go next according to the computational models.
 
 #### Climate
 This area is quite fascinating as it covers the entire planet. The data is sourced
@@ -390,12 +390,6 @@ amount of energy required to overcome the negatively buoyant, stable "cap" or
 parcel must break through before it can tap into the CAPE (Convective Available
 Potential Energy) above it. Combining both gives us a reasonable idea of the
 actual potential for storm formation.
-
-#### Storms
-The other side of the storm equation, these are the specific major named storms
-which occur and are tracked. Not only does this layer show you where the storm
-is and its poast track, it also shows you a predictive cone of probability
-for where the computational models think it will go next.
 
 #### Wind
 Wind is depicted as a grid of 'barbs' where the length is proportional to the
